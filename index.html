@@ -1,0 +1,1812 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#2D47C4">
+<meta name="description" content="Ежедневный тренажёр для подготовки к собеседованию на фронтенд-разработчика">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" type="image/png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Тренажёр">
+<title>Фронтенд-тренажёр</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Golos+Text:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* Раскладка: одна колонка-приложение до 560px, шапка сверху, таб-бар снизу у большого пальца */
+:root{
+  --bg:#F3F4F7; --surface:#FFFFFF; --surface-2:#E9ECF1; --line:#D8DCE3;
+  --fg:#14161B; --muted:#5B606B;
+  --accent:#2D47C4; --accent-fg:#FFFFFF; --accent-soft:#E3E7F9;
+  --ok:#157A46; --ok-soft:#DFF2E7; --bad:#B93424; --bad-soft:#FAE5E1;
+  --code-bg:#1A1D25; --code-fg:#E4E7EE; --code-str:#E5B567; --code-num:#9CB2FF; --code-kw:#F09A8C; --code-com:#7D8494;
+  --flame:#E07A1F; --flame-soft:#FCEBDA;
+  --f-ui:"Golos Text","Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  --f-mono:"JetBrains Mono","SFMono-Regular",Menlo,Consolas,monospace;
+  --r:10px;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0F1115; --surface:#171A20; --surface-2:#20242C; --line:#2B3039;
+  --fg:#ECEEF2; --muted:#9AA0AC;
+  --accent:#8B9EFF; --accent-fg:#0D1020; --accent-soft:#1F2647;
+  --ok:#4BC488; --ok-soft:#12301F; --bad:#FF7B6B; --bad-soft:#3A1915;
+  --code-bg:#0A0C10; --code-fg:#E4E7EE; --flame:#FFA64D; --flame-soft:#3A2512; color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --bg:#0F1115; --surface:#171A20; --surface-2:#20242C; --line:#2B3039;
+  --fg:#ECEEF2; --muted:#9AA0AC;
+  --accent:#8B9EFF; --accent-fg:#0D1020; --accent-soft:#1F2647;
+  --ok:#4BC488; --ok-soft:#12301F; --bad:#FF7B6B; --bad-soft:#3A1915;
+  --code-bg:#0A0C10; --code-fg:#E4E7EE; --flame:#FFA64D; --flame-soft:#3A2512; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 16px/1.55 var(--f-ui);-webkit-tap-highlight-color:transparent}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+h1,h2,h3{text-wrap:balance;margin:0}
+p{margin:0}
+.mono{font-family:var(--f-mono)}
+.tnum{font-variant-numeric:tabular-nums}
+
+.app{max-width:560px;margin:0 auto;min-height:100%;display:flex;flex-direction:column}
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px 10px}
+.brand{font:600 15px/1.2 var(--f-mono);letter-spacing:-.01em;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+@media (max-width:380px){.brand span{display:none}}
+.brand span{color:var(--muted);font-weight:400}
+.streak{font:600 13px/1 var(--f-mono);padding:7px 10px;border-radius:999px;background:var(--surface);border:1px solid var(--line)}
+.streak b{color:var(--accent)}
+main{flex:1;padding:4px 16px calc(96px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:14px}
+
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:6;background:var(--surface);border-top:1px solid var(--line);padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px))}
+.tabs-in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
+.tab{border:0;background:none;padding:8px 4px;border-radius:8px;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;color:var(--muted);min-height:52px}
+.tab svg{width:22px;height:22px}
+.tab[aria-current="page"]{color:var(--accent);background:var(--accent-soft)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px;display:flex;flex-direction:column;gap:12px}
+.card h2{font-size:20px;line-height:1.25;font-weight:700}
+.card h3{font-size:16px;font-weight:600}
+.muted{color:var(--muted)}
+.small{font-size:14px}
+.row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.spread{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+.btn{border:0;border-radius:8px;min-height:48px;padding:0 18px;font-weight:600;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--accent);color:var(--accent-fg);transition:transform .15s ease,opacity .15s ease}
+.btn:active{transform:scale(.98)}
+.btn[disabled]{opacity:.5;cursor:default}
+.btn.ghost{background:var(--surface-2);color:var(--fg)}
+.btn.line{background:none;border:1px solid var(--line);color:var(--fg)}
+.btn.block{width:100%}
+.link{border:0;background:none;padding:0;color:var(--accent);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+.bar{height:8px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent);border-radius:99px;transition:width .4s ease}
+.bar.ok i{background:var(--ok)}
+
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:12px}
+.stat b{display:block;font:600 22px/1.1 var(--f-mono)}
+.stat span{font-size:12.5px;color:var(--muted)}
+
+/* квиз */
+.qhead{display:flex;align-items:center;gap:12px}
+.qhead .bar{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 var(--f-mono);padding:6px 8px;border-radius:6px;background:var(--surface-2);color:var(--muted)}
+.chip.gen{background:var(--accent-soft);color:var(--accent)}
+.qtext{font-size:19px;line-height:1.4;font-weight:600}
+pre.code{margin:0;background:var(--code-bg);color:var(--code-fg);border-radius:8px;padding:14px;overflow-x:auto;font:400 14px/1.6 var(--f-mono);tab-size:2}
+pre.code .s{color:var(--code-str)} pre.code .n{color:var(--code-num)} pre.code .k{color:var(--code-kw)} pre.code .c{color:var(--code-com);font-style:italic}
+.opts{display:flex;flex-direction:column;gap:8px}
+.opt{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px;display:flex;gap:12px;align-items:flex-start;min-height:52px;transition:border-color .15s ease,background-color .15s ease}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt .l{flex:none;width:26px;height:26px;border-radius:6px;display:grid;place-items:center;font:600 13px/1 var(--f-mono);background:var(--surface-2);color:var(--muted)}
+.opt .t{min-width:0;overflow-wrap:anywhere}
+.opt[disabled]{cursor:default}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.right .l{background:var(--ok);color:#fff}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.wrong .l{background:var(--bad);color:#fff}
+.fb{border-radius:8px;padding:14px;display:flex;flex-direction:column;gap:10px}
+.fb.ok{background:var(--ok-soft)}
+.fb.bad{background:var(--bad-soft)}
+.fb h3{font-size:16px}
+.fb.ok h3{color:var(--ok)} .fb.bad h3{color:var(--bad)}
+.fb .lbl{font:600 13px/1.4 var(--f-ui);color:var(--muted)}
+.fb .lbl b{font-family:var(--f-mono);color:var(--fg)}
+.ai{border-left:3px solid var(--accent);padding:2px 0 2px 12px;display:flex;flex-direction:column;gap:8px;font-size:15px}
+.ai pre.code{font-size:13px}
+
+/* памятка */
+.search{width:100%;min-height:48px;border:1px solid var(--line);border-radius:8px;background:var(--surface);padding:0 14px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips button{flex:none;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 12px;font-size:13.5px;white-space:nowrap}
+.chips button[aria-pressed="true"]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.note .tag{font:600 11.5px/1 var(--f-mono);color:var(--accent)}
+
+/* темы */
+.topic{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:center;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--r);padding:14px}
+.topic .bar{grid-column:1/-1}
+.topic b{font-weight:600}
+
+/* прогресс */
+.chart{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;align-items:end;height:120px}
+.chart .col{display:flex;flex-direction:column;justify-content:flex-end;height:100%;gap:0;position:relative}
+.chart .tot{background:var(--surface-2);border-radius:3px 3px 0 0;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;min-height:2px}
+.chart .okp{background:var(--ok)}
+.chart-lbl{display:grid;grid-template-columns:repeat(14,1fr);gap:4px;font:400 10.5px/1 var(--f-mono);color:var(--muted);text-align:center}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line)}
+th{font-weight:600;color:var(--muted);font-size:12.5px}
+td.r,th.r{text-align:right}
+.mistake{border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+.mistake>button{width:100%;border:0;background:none;text-align:left;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.mistake .body{padding:0 14px 14px;display:flex;flex-direction:column;gap:10px}
+.pill{font:600 11.5px/1 var(--f-mono);padding:4px 7px;border-radius:5px}
+.pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.ok{background:var(--ok-soft);color:var(--ok)}
+.empty{text-align:center;padding:24px 8px;color:var(--muted)}
+/* ударный режим и опыт */
+.hero{display:grid;grid-template-columns:auto minmax(0,1fr);gap:16px;align-items:center}
+.ring{width:92px;height:92px;position:relative;flex:none}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring circle{fill:none;stroke-width:9}
+.ring .trk{stroke:var(--surface-2)}
+.ring .val{stroke:var(--accent);stroke-linecap:round;transition:stroke-dashoffset .8s cubic-bezier(.2,.7,.2,1)}
+.ring.full .val{stroke:var(--ok)}
+.ring span{position:absolute;inset:0;display:grid;place-items:center;font:600 20px/1 var(--f-mono)}
+.flame{width:18px;height:18px;flex:none}
+.flame path{fill:var(--muted)}
+.flame.on path{fill:var(--flame)}
+.streak{display:inline-flex;align-items:center;gap:6px}
+.streak.on{background:var(--flame-soft);border-color:transparent}
+.streak.on b{color:var(--flame)}
+.xpchip{white-space:nowrap;font:600 13px/1 var(--f-mono);padding:7px 10px;border-radius:999px;background:var(--accent-soft);color:var(--accent)}
+.topr{display:flex;gap:6px;align-items:center}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;text-align:center}
+.week .d{display:flex;flex-direction:column;align-items:center;gap:5px;font:500 11.5px/1 var(--f-mono);color:var(--muted)}
+.week .dot{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:var(--surface-2);border:2px solid transparent}
+.week .dot svg{width:15px;height:15px}
+.week .done .dot{background:var(--flame);color:#fff}
+.week .part .dot{border-color:var(--flame);background:var(--flame-soft)}
+.week .today .dot{border-color:var(--fg)}
+.week .done.today .dot{border-color:var(--flame)}
+.risk{font-size:14px;padding:10px 12px;border-radius:8px;background:var(--flame-soft)}
+.combo{font:600 12px/1 var(--f-mono);padding:6px 8px;border-radius:6px;background:var(--flame-soft);color:var(--flame);white-space:nowrap}
+.float{position:absolute;right:14px;top:50%;font:700 15px/1 var(--f-mono);color:var(--ok);pointer-events:none;animation:floatUp 1s ease-out forwards}
+.opt{position:relative}
+.opt.right{animation:pop .35s ease}
+.opt.wrong{animation:shake .4s ease}
+@keyframes pop{0%{transform:scale(1)}40%{transform:scale(1.025)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(2px)}}
+@keyframes floatUp{0%{opacity:0;transform:translateY(0)}20%{opacity:1}100%{opacity:0;transform:translateY(-34px)}}
+.celebrate{text-align:center;align-items:center;background:linear-gradient(var(--flame-soft),var(--surface) 70%)}
+.celebrate .big{width:64px;height:64px}
+.celebrate .num{font:700 44px/1 var(--f-mono);color:var(--flame)}
+.lvl{display:flex;align-items:center;gap:10px}
+.lvl .bar{flex:1}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+@media (prefers-reduced-motion: reduce){.opt.right,.opt.wrong,.float{animation:none}}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:10px 14px;border-radius:8px;font-size:14px;z-index:9;max-width:calc(100% - 32px)}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">frontend<span>.тренажёр</span></div>
+    <div class="topr"><span class="xpchip tnum" id="xp">Ур. 1</span><div class="streak tnum" id="streak">0</div></div>
+  </header>
+  <main id="view" aria-live="polite"></main>
+  <nav class="tabs" aria-label="Разделы">
+    <div class="tabs-in">
+      <button class="tab" data-tab="today"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 10h18M8 15l2.5 2.5L16 13"/></svg>Сегодня</button>
+      <button class="tab" data-tab="topics"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6l-6 6 6 6M16 6l6 6-6 6"/></svg>Темы</button>
+      <button class="tab" data-tab="notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h11l5 5v11H4z"/><path d="M15 4v5h5M8 13h8M8 17h5"/></svg>Памятка</button>
+      <button class="tab" data-tab="progress"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>Прогресс</button>
+    </div>
+  </nav>
+</div>
+
+<script>
+// База тренажёра. Типы: code — «что выведет», case — ситуация, theory — теория, hr — собеседование.
+// out — ожидаемый вывод кода (для автопроверки), a — индекс правильного ответа.
+const TOPICS = {
+  js:      'JavaScript',
+  async:   'Асинхронность',
+  dom:     'DOM и события',
+  html:    'HTML',
+  css:     'CSS',
+  web:     'Браузер и сеть',
+  git:     'Git',
+  wp:      'WordPress и PHP',
+  perf:    'Скорость и доступность',
+  react:   'React',
+  hr:      'Собеседование',
+};
+
+const QUESTIONS = [
+// ---------- JavaScript ----------
+{id:'js1',t:'js',k:'code',q:'Что выведет код?',code:`console.log(typeof null);`,out:'object',
+ o:['"null"','"object"','"undefined"','Ошибку'],a:1,
+ e:'Историческая ошибка языка: typeof null возвращает "object". Проверять null нужно строго: value === null.'},
+{id:'js2',t:'js',k:'code',q:'Что выведет код?',code:`console.log(0.1 + 0.2 === 0.3);`,out:'false',
+ o:['true','false','NaN','Ошибку'],a:1,
+ e:'Дробные числа хранятся в двоичном виде с погрешностью: 0.1 + 0.2 = 0.30000000000000004. Деньги считают в копейках или сравнивают с допуском.'},
+{id:'js3',t:'js',k:'code',q:'Что выведет код?',code:`console.log(1 + '2' - 1);`,out:'11',
+ o:['2','"111"','11','NaN'],a:2,
+ e:'Сначала 1 + "2" склеивает строки в "12". Минус работает только с числами, поэтому "12" - 1 = 11.'},
+{id:'js4',t:'js',k:'code',q:'Что выведет код?',code:`const a = [1, 2, 3];
+const b = a;
+b.push(4);
+console.log(a.length);`,out:'4',
+ o:['3','4','undefined','Ошибку: a — константа'],a:1,
+ e:'Массивы и объекты копируются по ссылке: a и b указывают на один массив. const запрещает переприсваивание переменной, но не изменение содержимого.'},
+{id:'js5',t:'js',k:'code',q:'Что выведет код?',code:`console.log(x);
+var x = 5;`,out:'undefined',
+ o:['5','undefined','ReferenceError','null'],a:1,
+ e:'Объявление var поднимается в начало функции (hoisting), а присваивание остаётся на месте. Поэтому x уже существует, но пока равен undefined.'},
+{id:'js6',t:'js',k:'code',q:'Что выведет код?',code:`console.log(y);
+let y = 5;`,out:'ReferenceError',
+ o:['5','undefined','ReferenceError','null'],a:2,
+ e:'let и const тоже поднимаются, но до строки объявления находятся во «временной мёртвой зоне». Обращение к ним раньше времени бросает ReferenceError.'},
+{id:'js7',t:'js',k:'code',q:'Что выведет код?',code:`const user = { name: 'Аня' };
+const copy = { ...user };
+copy.name = 'Оля';
+console.log(user.name);`,out:'Аня',
+ o:['Аня','Оля','undefined','Ошибку'],a:0,
+ e:'Спред создаёт новый объект с копиями полей первого уровня. Изменение copy не трогает user.'},
+{id:'js8',t:'js',k:'code',q:'Что выведет код?',code:`const order = { item: { qty: 1 } };
+const copy = { ...order };
+copy.item.qty = 5;
+console.log(order.item.qty);`,out:'5',
+ o:['1','5','undefined','Ошибку'],a:1,
+ e:'Спред копирует только первый уровень. Вложенный объект item остаётся общим. Для глубокой копии есть structuredClone(order).'},
+{id:'js9',t:'js',k:'code',q:'Что выведет код?',code:`console.log(null == undefined, null === undefined);`,out:'true false',
+ o:['true true','false false','true false','false true'],a:2,
+ e:'При нестрогом сравнении null и undefined равны только друг другу. Строгое сравнение учитывает тип, а типы у них разные.'},
+{id:'js10',t:'js',k:'code',q:'Что выведет код?',code:`console.log(NaN === NaN);`,out:'false',
+ o:['true','false','NaN','Ошибку'],a:1,
+ e:'NaN не равен ничему, даже себе. Проверять нужно через Number.isNaN(value).'},
+{id:'js11',t:'js',k:'code',q:'Что выведет код?',code:`const nums = [3, 1, 10, 2];
+nums.sort();
+console.log(nums);`,out:'[1,10,2,3]',
+ o:['[1, 2, 3, 10]','[10, 3, 2, 1]','[1, 10, 2, 3]','[3, 1, 10, 2]'],a:2,
+ e:'Без функции сравнения sort сортирует элементы как строки: "10" идёт раньше "2". Для чисел пишут nums.sort((a, b) => a - b).'},
+{id:'js12',t:'js',k:'code',q:'Что выведет код?',code:`console.log([1, 2, 3].includes('2'));`,out:'false',
+ o:['true','false','1','Ошибку'],a:1,
+ e:'includes сравнивает строго: строка "2" не равна числу 2.'},
+{id:'js13',t:'js',k:'code',q:'Что выведет код?',code:`let s = 'hello';
+s[0] = 'H';
+console.log(s);`,out:'hello',
+ o:['Hello','hello','Ошибку','undefined'],a:1,
+ e:'Строки неизменяемы. Присваивание по индексу молча игнорируется. Новую строку собирают так: s[0].toUpperCase() + s.slice(1).'},
+{id:'js14',t:'js',k:'code',q:'Что выведет код?',code:`console.log(Number('12px'), parseInt('12px'));`,out:'NaN 12',
+ o:['12 12','NaN 12','NaN NaN','12 NaN'],a:1,
+ e:'Number требует, чтобы вся строка была числом. parseInt читает цифры слева, пока не встретит лишний символ.'},
+{id:'js15',t:'js',k:'code',q:'Что выведет код?',code:`let x = 1;
+{
+  let x = 2;
+}
+console.log(x);`,out:'1',
+ o:['1','2','undefined','Ошибку'],a:0,
+ e:'let видна только внутри своего блока. Внутренняя x — отдельная переменная, внешняя не меняется.'},
+{id:'js16',t:'js',k:'code',q:'Что выведет код?',code:`const total = [1, 2, 3].reduce((sum, n) => sum + n, 0);
+console.log(total);`,out:'6',
+ o:['6','"123"','[1, 2, 3]','0'],a:0,
+ e:'reduce проходит по массиву и копит результат: 0 + 1 + 2 + 3 = 6. Второй аргумент (0) — начальное значение.'},
+{id:'js17',t:'js',k:'code',q:'Что выведет код?',code:`function price(base, tax = base * 0.2) {
+  return base + tax;
+}
+console.log(price(100));`,out:'120',
+ o:['100','120','NaN','undefined'],a:1,
+ e:'Параметр по умолчанию вычисляется, когда аргумент не передан, и может использовать предыдущие параметры.'},
+{id:'js18',t:'js',k:'code',q:'Что выведет код?',code:`const user = {};
+console.log(user.address?.city);`,out:'undefined',
+ o:['undefined','null','TypeError','""'],a:0,
+ e:'Опциональная цепочка ?. останавливается на undefined и возвращает undefined вместо ошибки «Cannot read properties of undefined».'},
+{id:'js19',t:'js',k:'code',q:'Что выведет код?',code:`console.log(0 || 5, 0 ?? 5);`,out:'5 0',
+ o:['5 5','0 0','5 0','0 5'],a:2,
+ e:'|| берёт правую часть для любого «ложного» значения, включая 0 и "". ?? срабатывает только на null и undefined.'},
+{id:'js20',t:'js',k:'code',q:'Что выведет код?',code:`const [first, , third] = [10, 20, 30];
+console.log(first, third);`,out:'10 30',
+ o:['10 20','10 30','20 30','10 undefined'],a:1,
+ e:'Пропуск между запятыми при деструктуризации пропускает элемент массива.'},
+{id:'js21',t:'js',k:'code',q:'Что выведет код?',code:`function counter() {
+  let count = 0;
+  return () => ++count;
+}
+const inc = counter();
+inc();
+console.log(inc());`,out:'2',
+ o:['0','1','2','undefined'],a:2,
+ e:'Это замыкание: функция помнит переменную count из места, где её создали. Каждый вызов увеличивает одну и ту же count.'},
+{id:'js22',t:'js',k:'code',q:'Что выведет код?',code:`console.log(!!'', !!'0', !![]);`,out:'false true true',
+ o:['false false false','false true true','true true false','false true false'],a:1,
+ e:'Ложных значений всего шесть: false, 0, "", null, undefined, NaN. Строка "0" и пустой массив считаются истиной.'},
+{id:'js23',t:'js',k:'code',q:'Что выведет код?',code:`console.log([1, 2, 3, 4].filter(n => n % 2).map(n => n * 10));`,out:'[10,30]',
+ o:['[10, 30]','[20, 40]','[10, 20, 30, 40]','[1, 3]'],a:0,
+ e:'n % 2 даёт 1 (истина) для нечётных, поэтому filter оставляет 1 и 3, а map умножает их на 10.'},
+{id:'js24',t:'js',k:'theory',q:'Как надёжно проверить, что переменная — массив?',
+ o:['typeof value === "array"','Array.isArray(value)','value instanceof Object','value.length > 0'],a:1,
+ e:'typeof для массива возвращает "object". Array.isArray — стандартный и надёжный способ.'},
+{id:'js25',t:'js',k:'theory',q:'Чем отличаются let и const?',
+ o:['const нельзя переприсвоить, let можно','const быстрее работает','let видна во всей функции, const — в блоке','Ничем, это синонимы'],a:0,
+ e:'Обе переменные блочные. const запрещает переприсваивание, но объект или массив внутри const менять можно.'},
+{id:'js26',t:'js',k:'case',q:'В объекте с настройками нужно получить значение, но поле иногда приходит пустым, и тогда должно быть "по умолчанию". При этом 0 — допустимое значение. Что написать?',
+ o:['settings.limit || 10','settings.limit ?? 10','settings.limit && 10','settings.limit ? settings.limit : 10'],a:1,
+ e:'?? подставляет значение только для null и undefined. С || ноль тоже заменился бы на 10.'},
+{id:'js27',t:'js',k:'code',q:'Что выведет код?',code:`const obj = { a: 1, b: 2 };
+console.log(Object.keys(obj).length);`,out:'2',
+ o:['2','undefined','1','Ошибку'],a:0,
+ e:'Object.keys возвращает массив ключей объекта. Так удобно узнать количество полей или перебрать их.'},
+{id:'js28',t:'js',k:'code',q:'Что выведет код?',code:`const str = 'кот';
+console.log([...str].reverse().join(''));`,out:'ток',
+ o:['кот','ток','["т","о","к"]','Ошибку'],a:1,
+ e:'Спред разбивает строку на массив символов, reverse разворачивает его, join склеивает обратно.'},
+
+// ---------- Асинхронность ----------
+{id:'as1',t:'async',k:'code',q:'В каком порядке появятся числа?',code:`console.log(1);
+setTimeout(() => console.log(2), 0);
+Promise.resolve().then(() => console.log(3));
+console.log(4);`,out:'1 4 3 2',
+ o:['1 2 3 4','1 4 2 3','1 4 3 2','1 3 4 2'],a:2,
+ e:'Сначала выполняется весь синхронный код (1, 4). Потом микрозадачи — колбэки промисов (3). Потом макрозадачи — таймеры (2).'},
+{id:'as2',t:'async',k:'code',q:'В каком порядке появятся буквы?',code:`async function load() {
+  console.log('a');
+  await null;
+  console.log('b');
+}
+load();
+console.log('c');`,out:'a c b',
+ o:['a b c','a c b','c a b','b a c'],a:1,
+ e:'Код async-функции до первого await выполняется синхронно. После await остаток уходит в очередь микрозадач, поэтому c выводится раньше b.'},
+{id:'as3',t:'async',k:'code',q:'Что выведет код?',code:`for (var i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}`,out:'3 3 3',
+ o:['0 1 2','3 3 3','2 2 2','undefined ×3'],a:1,
+ e:'var одна на весь цикл. Таймеры срабатывают после цикла, когда i уже 3. С let у каждой итерации своя переменная, и вывод будет 0 1 2.'},
+{id:'as4',t:'async',k:'code',q:'Что выведет код?',code:`for (let i = 0; i < 3; i++) {
+  setTimeout(() => console.log(i), 0);
+}`,out:'0 1 2',
+ o:['0 1 2','3 3 3','2 2 2','0 0 0'],a:0,
+ e:'let создаёт новую переменную на каждой итерации, и каждый колбэк помнит свою.'},
+{id:'as5',t:'async',k:'code',q:'В каком порядке появятся числа?',code:`new Promise(resolve => {
+  console.log(1);
+  resolve();
+}).then(() => console.log(2));
+console.log(3);`,out:'1 3 2',
+ o:['1 2 3','3 1 2','1 3 2','2 1 3'],a:2,
+ e:'Функция внутри new Promise выполняется сразу и синхронно. А .then всегда срабатывает асинхронно, после текущего кода.'},
+{id:'as6',t:'async',k:'code',q:'Что выведет код?',code:`Promise.reject(new Error('сбой'))
+  .catch(e => console.log(e.message))
+  .then(() => console.log('готово'));`,out:'сбой готово',
+ o:['сбой','готово','сбой готово','Необработанную ошибку'],a:2,
+ e:'catch обрабатывает ошибку и возвращает обычный промис, поэтому цепочка продолжается и следующий then срабатывает.'},
+{id:'as7',t:'async',k:'code',q:'Что выведет код?',code:`async function getNumber() {
+  return 5;
+}
+console.log(getNumber() instanceof Promise);`,out:'true',
+ o:['true','false','5','undefined'],a:0,
+ e:'async-функция всегда возвращает промис, даже если внутри обычный return. Значение получают через await или .then.'},
+{id:'as8',t:'async',k:'case',q:'fetch к API вернул ответ 404, но блок catch не сработал. Почему?',
+ o:['fetch отклоняет промис только при сетевой ошибке, а 404 — успешный ответ сервера','catch не работает с fetch','Нужно было писать catch до then','404 — это не ошибка'],a:0,
+ e:'fetch падает только когда сети нет или запрос не дошёл. Статус надо проверять самому: if (!response.ok) throw new Error(response.status).'},
+{id:'as9',t:'async',k:'theory',q:'Что делает Promise.all([p1, p2, p3])?',
+ o:['Ждёт первый выполненный промис','Ждёт все промисы и отклоняется, если упал хотя бы один','Ждёт все и никогда не отклоняется','Выполняет промисы по очереди'],a:1,
+ e:'Promise.all ждёт все и возвращает массив результатов. Если нужны результаты даже при ошибках, используют Promise.allSettled.'},
+{id:'as10',t:'async',k:'case',q:'Нужно загрузить список товаров и показать «Загрузка…» до ответа. Где убрать надпись, чтобы она исчезла и при успехе, и при ошибке?',
+ o:['В then','В catch','В finally','Сразу после вызова fetch'],a:2,
+ e:'finally выполняется в любом случае. В async-коде то же самое делает блок finally после try/catch.'},
+
+// ---------- DOM и события ----------
+{id:'dom1',t:'dom',k:'case',q:'Кнопки «Удалить» добавляются в список динамически, и обработчик, повешенный при загрузке, на новых кнопках не срабатывает. Как правильно?',
+ o:['Повесить обработчик на родительский список и проверять event.target (делегирование)','Перезагружать страницу после добавления','Использовать onclick в HTML','Вызвать addEventListener в setInterval'],a:0,
+ e:'Событие всплывает к родителю. Один обработчик на контейнере ловит клики и по новым элементам: if (e.target.closest(".delete")) ...'},
+{id:'dom2',t:'dom',k:'case',q:'При отправке формы страница перезагружается, а нужно отправить данные через fetch. Что сделать?',
+ o:['event.stopPropagation()','event.preventDefault() в обработчике submit','Убрать тег form','return false в HTML-атрибуте action'],a:1,
+ e:'preventDefault отменяет действие браузера по умолчанию, здесь это отправку формы с перезагрузкой.'},
+{id:'dom3',t:'dom',k:'theory',q:'Чем stopPropagation отличается от preventDefault?',
+ o:['Это одно и то же','stopPropagation останавливает всплытие события, preventDefault отменяет действие браузера','preventDefault останавливает всплытие','stopPropagation отменяет переход по ссылке'],a:1,
+ e:'Например, клик по ссылке: preventDefault не даст перейти, stopPropagation не даст событию дойти до родителей.'},
+{id:'dom4',t:'dom',k:'theory',q:'Что вернёт document.querySelector(".card"), если на странице нет такого элемента?',
+ o:['Пустой массив','undefined','null','Выбросит ошибку'],a:2,
+ e:'querySelector возвращает первый найденный элемент или null. querySelectorAll возвращает пустой NodeList.'},
+{id:'dom5',t:'dom',k:'case',q:'Нужно вывести на страницу имя, которое ввёл пользователь. Как безопаснее?',
+ o:['el.innerHTML = name','el.textContent = name','document.write(name)','el.outerHTML = name'],a:1,
+ e:'innerHTML выполнит HTML из строки, и через это можно внедрить вредоносный код (XSS). textContent вставляет текст как есть.'},
+{id:'dom6',t:'dom',k:'theory',q:'Чем атрибут defer у тега script отличается от async?',
+ o:['Ничем','defer выполняет скрипты по порядку после разбора HTML, async — сразу по загрузке в любом порядке','async ждёт загрузки картинок','defer работает только для inline-скриптов'],a:1,
+ e:'Для своих скриптов, которые работают с DOM, обычно берут defer. async подходит независимым скриптам вроде аналитики.'},
+{id:'dom7',t:'dom',k:'code',q:'Что выведет код для элемента <div data-user-id="7">?',code:`console.log(el.dataset.userId);`,out:'7',
+ o:['undefined','"7"','7 (число)','Ошибку'],a:1,
+ e:'data-атрибуты доступны через dataset, имя переводится в camelCase. Значение всегда строка.'},
+{id:'dom8',t:'dom',k:'case',q:'Нужно сохранить корзину в localStorage, а после перезагрузки там «[object Object]». В чём ошибка?',
+ o:['localStorage хранит только строки, объект надо сохранить через JSON.stringify и читать через JSON.parse','localStorage очищается при перезагрузке','Нужно использовать sessionStorage','Объект слишком большой'],a:0,
+ e:'При записи объект неявно превращается в строку "[object Object]". Правильно: localStorage.setItem("cart", JSON.stringify(cart)).'},
+{id:'dom9',t:'dom',k:'theory',q:'Что делает el.classList.toggle("open")?',
+ o:['Всегда добавляет класс','Удаляет класс, если он есть, и добавляет, если нет','Проверяет наличие класса','Заменяет все классы на open'],a:1,
+ e:'toggle удобен для меню и аккордеонов. Вторым аргументом можно принудительно включить или выключить: toggle("open", true).'},
+{id:'dom10',t:'dom',k:'theory',q:'Какое событие наступает раньше?',
+ o:['load','DOMContentLoaded','Одновременно','Зависит от браузера'],a:1,
+ e:'DOMContentLoaded — HTML разобран и DOM готов. load — загрузились ещё и картинки, шрифты, стили.'},
+
+// ---------- HTML ----------
+{id:'h1',t:'html',k:'theory',q:'Зачем нужен атрибут alt у картинки?',
+ o:['Для подписи под картинкой','Текст для скринридеров и на случай, если картинка не загрузилась','Чтобы картинка грузилась быстрее','Для всплывающей подсказки'],a:1,
+ e:'alt описывает смысл картинки. У декоративных картинок оставляют пустой alt="", чтобы скринридер их пропускал.'},
+{id:'h2',t:'html',k:'theory',q:'Когда использовать button, а когда ссылку a?',
+ o:['Без разницы, можно стилизовать одинаково','button — действие на странице, a — переход по адресу','a — для форм, button — для меню','button только внутри form'],a:1,
+ e:'Это важно для доступности: клавиатура и скринридеры по-разному работают с кнопками и ссылками.'},
+{id:'h3',t:'html',k:'theory',q:'Зачем связывать label с полем через for и id?',
+ o:['Только ради красоты','Клик по подписи ставит фокус в поле, а скринридер зачитывает подпись','Без этого форма не отправится','Это нужно только для чекбоксов'],a:1,
+ e:'Связанная подпись увеличивает зону клика и делает форму доступной.'},
+{id:'h4',t:'html',k:'theory',q:'Что делает meta name="viewport" content="width=device-width, initial-scale=1"?',
+ o:['Подключает адаптивные стили','Говорит мобильному браузеру не масштабировать страницу как десктопную','Запрещает зум','Ускоряет загрузку'],a:1,
+ e:'Без этого тега телефон рисует страницу шириной около 980px и уменьшает её, и медиазапросы не срабатывают как задумано.'},
+{id:'h5',t:'html',k:'case',q:'В форме заявки на телефоне выскакивает буквенная клавиатура для поля «Телефон». Как исправить?',
+ o:['type="number"','type="tel"','pattern="[0-9]"','inputmode="text"'],a:1,
+ e:'type="tel" открывает цифровую клавиатуру. number не подходит: он убирает плюс и ведущие нули и показывает стрелки.'},
+{id:'h6',t:'html',k:'theory',q:'Что даёт атрибут loading="lazy" у img?',
+ o:['Картинка загрузится, когда пользователь до неё доскроллит','Картинка сжимается','Картинка грузится в низком качестве','Ничего, это устаревший атрибут'],a:0,
+ e:'Ленивая загрузка экономит трафик. Для картинки на первом экране lazy не ставят, иначе она появится позже.'},
+{id:'h7',t:'html',k:'theory',q:'Какой тег подходит для основной навигации сайта?',
+ o:['div class="menu"','nav','menu','header'],a:1,
+ e:'Семантические теги (header, nav, main, footer, article) помогают поисковикам и скринридерам понять структуру страницы.'},
+{id:'h8',t:'html',k:'theory',q:'Сколько заголовков h1 рекомендуется на странице?',
+ o:['Сколько угодно','Один, главный заголовок страницы','Ни одного','По одному в каждой секции'],a:1,
+ e:'Один h1 с главной темой страницы, дальше h2 и h3 по иерархии без пропусков уровней.'},
+{id:'h9',t:'html',k:'theory',q:'Для чего нужен атрибут srcset у картинки?',
+ o:['Для подписи','Браузер выбирает файл подходящего размера под экран','Для анимации','Для ленивой загрузки'],a:1,
+ e:'Телефону не нужно качать картинку шириной 2400px. srcset и sizes позволяют отдать файл под экран.'},
+{id:'h10',t:'html',k:'theory',q:'Что делает атрибут required у поля формы?',
+ o:['Делает поле жирным','Браузер не отправит форму, пока поле пустое','Добавляет звёздочку','Сохраняет значение'],a:1,
+ e:'Это встроенная валидация браузера. Проверку на сервере она не заменяет.'},
+
+// ---------- CSS ----------
+{id:'c1',t:'css',k:'theory',q:'У элемента есть id="title" и class="heading". Правила #title { color: red } и .heading { color: blue }. Какого цвета текст?',
+ o:['Синего','Красного','Зависит от порядка в файле','Фиолетового'],a:1,
+ e:'Селектор по id специфичнее селектора по классу, поэтому он побеждает независимо от порядка.'},
+{id:'c2',t:'css',k:'theory',q:'width: 200px; padding: 20px; box-sizing: border-box. Какая итоговая ширина блока?',
+ o:['200px','240px','220px','160px'],a:0,
+ e:'При border-box padding и рамка входят в заданную ширину. При content-box блок стал бы 240px.'},
+{id:'c3',t:'css',k:'case',q:'Нужно отцентрировать блок по горизонтали и вертикали внутри родителя. Самый простой способ?',
+ o:['margin: auto у ребёнка','display: flex; justify-content: center; align-items: center у родителя','text-align: center','position: center'],a:1,
+ e:'Ещё короче: display: grid; place-items: center.'},
+{id:'c4',t:'css',k:'theory',q:'Относительно чего позиционируется элемент с position: absolute?',
+ o:['Относительно окна браузера','Относительно ближайшего предка с position, отличным от static','Относительно родителя всегда','Относительно body'],a:1,
+ e:'Поэтому родителю обычно ставят position: relative.'},
+{id:'c5',t:'css',k:'theory',q:'Чем rem отличается от em?',
+ o:['Ничем','rem считается от размера шрифта html, em — от размера шрифта текущего элемента','em считается от html','rem — только для отступов'],a:1,
+ e:'rem предсказуем. em удобен, когда размер должен зависеть от шрифта самого компонента, например отступы кнопки.'},
+{id:'c6',t:'css',k:'case',q:'Поставил z-index: 999, но элемент всё равно под другим блоком. Что проверить первым?',
+ o:['Увеличить до 9999','Есть ли у элемента position (не static) и не создаёт ли родитель свой контекст наложения','Поставить !important','Перенести CSS выше'],a:1,
+ e:'z-index работает у позиционированных элементов и flex/grid-детей. Родитель с transform, opacity < 1 или своим z-index создаёт контекст, выше которого ребёнок не поднимется.'},
+{id:'c7',t:'css',k:'theory',q:'Что делает grid-template-columns: repeat(3, 1fr)?',
+ o:['Три строки','Три колонки равной ширины','Три колонки по 1px','Повторяет элемент три раза'],a:1,
+ e:'fr — доля свободного места. Для адаптива удобно repeat(auto-fit, minmax(240px, 1fr)).'},
+{id:'c8',t:'css',k:'case',q:'На телефоне у страницы появилась горизонтальная прокрутка. Как найти виновника?',
+ o:['Поставить body { overflow-x: hidden } и забыть','В DevTools найти элемент шире экрана: картинка без max-width, фиксированная ширина, длинное слово, flex-ребёнок без min-width: 0','Удалить медиазапросы','Уменьшить шрифт'],a:1,
+ e:'overflow-x: hidden прячет симптом, но может сломать position: sticky. Надёжнее найти и исправить сам элемент.'},
+{id:'c9',t:'css',k:'theory',q:'Чем display: none отличается от visibility: hidden?',
+ o:['Ничем','none убирает элемент из потока, hidden оставляет пустое место','hidden убирает из потока','none можно анимировать'],a:1,
+ e:'Для анимированного появления обычно используют opacity и visibility, потому что display не анимируется.'},
+{id:'c10',t:'css',k:'theory',q:'Какие свойства лучше анимировать для плавности?',
+ o:['width и height','top и left','transform и opacity','margin'],a:2,
+ e:'transform и opacity не вызывают пересчёт раскладки страницы и обрабатываются видеокартой.'},
+{id:'c11',t:'css',k:'theory',q:'Что делает font-size: clamp(1rem, 2.5vw, 2rem)?',
+ o:['Фиксирует 2rem','Размер растёт с шириной экрана, но не меньше 1rem и не больше 2rem','Обрезает текст','Работает только на мобильных'],a:1,
+ e:'clamp(минимум, предпочтительное, максимум) — удобный способ сделать адаптивную типографику без медиазапросов.'},
+{id:'c12',t:'css',k:'theory',q:'Что делает object-fit: cover у картинки?',
+ o:['Растягивает с искажением','Заполняет блок целиком без искажения, обрезая лишнее','Вписывает целиком с полями','Делает картинку фоном'],a:1,
+ e:'Часто вместе с object-position, чтобы обрезка не съела главное в кадре.'},
+{id:'c13',t:'css',k:'theory',q:'Подход mobile-first в медиазапросах — это…',
+ o:['Писать базовые стили для телефона и расширять их через min-width','Писать стили для десктопа и уменьшать через max-width','Делать только мобильную версию','Использовать только vw'],a:0,
+ e:'Базовые стили проще, а сложная раскладка добавляется для широких экранов.'},
+{id:'c14',t:'css',k:'case',q:'Карточки в flex-ряду: длинное слово в одной из них растягивает ряд и ломает вёрстку. Что поможет?',
+ o:['min-width: 0 у flex-ребёнка и overflow-wrap: anywhere у текста','display: block','float: left','width: 100vw'],a:0,
+ e:'По умолчанию flex-ребёнок не сжимается меньше своего содержимого (min-width: auto).'},
+{id:'c15',t:'css',k:'theory',q:'Почему соседние вертикальные отступы margin иногда «схлопываются»?',
+ o:['Это баг браузера','Вертикальные margin соседних блочных элементов объединяются в больший из двух','Из-за box-sizing','Из-за flex'],a:1,
+ e:'Внутри flex и grid схлопывания нет. Поэтому расстояния между элементами удобно задавать через gap.'},
+
+// ---------- Браузер и сеть ----------
+{id:'w1',t:'web',k:'theory',q:'Что означает статус ответа 404?',
+ o:['Ошибка сервера','Ресурс не найден','Нет доступа','Перенаправление'],a:1,
+ e:'2xx — успех, 3xx — перенаправление (301 навсегда, 302 временно), 4xx — ошибка запроса (403 нет доступа, 404 не найдено), 5xx — ошибка сервера.'},
+{id:'w2',t:'web',k:'theory',q:'Что такое CORS?',
+ o:['Формат картинок','Правила браузера, разрешающие или запрещающие запросы к другому домену','Протокол шифрования','Тип базы данных'],a:1,
+ e:'Чужой сервер должен явно разрешить запросы с вашего домена заголовком Access-Control-Allow-Origin. Исправляется на сервере, а не во фронтенде.'},
+{id:'w3',t:'web',k:'case',q:'Обновил CSS на сайте, а заказчик говорит, что ничего не изменилось. Скорее всего…',
+ o:['Изменения не сохранились','Браузер или плагин кэша отдаёт старый файл: жёсткая перезагрузка, сброс кэша, версия в ссылке style.css?v=2','Нужно перезагрузить сервер','Сломан CSS'],a:1,
+ e:'В WordPress версию файла задают в wp_enqueue_style, а кэширующие плагины тоже нужно очищать.'},
+{id:'w4',t:'web',k:'case',q:'Сайт переехал на HTTPS, и часть картинок пропала, а в консоли ругань Mixed Content. Что делать?',
+ o:['Вернуть HTTP','Заменить ссылки http:// на https:// в базе и шаблонах','Отключить SSL','Очистить кэш браузера'],a:1,
+ e:'Браузер блокирует небезопасные ресурсы на защищённой странице. В WordPress ссылки меняют через поиск и замену в базе.'},
+{id:'w5',t:'web',k:'theory',q:'Чем GET отличается от POST?',
+ o:['Ничем','GET получает данные и передаёт параметры в адресе, POST отправляет данные в теле запроса','POST быстрее','GET безопаснее для паролей'],a:1,
+ e:'Пароли и данные форм отправляют через POST: параметры GET остаются в истории браузера и логах сервера.'},
+{id:'w6',t:'web',k:'theory',q:'Где лучше хранить токен авторизации, чтобы JavaScript на странице не мог его прочитать?',
+ o:['localStorage','Cookie с флагом HttpOnly','В переменной window','В sessionStorage'],a:1,
+ e:'HttpOnly-cookie недоступна из JS, и это защищает токен от кражи при XSS.'},
+{id:'w7',t:'web',k:'case',q:'Форма на сайте «ничего не делает». С чего начать?',
+ o:['Переписать форму с нуля','Открыть DevTools: Console (ошибки JS) и Network (ушёл ли запрос и какой ответ)','Позвонить хостеру','Сменить браузер'],a:1,
+ e:'Console и Network показывают 90 % проблем с формами: ошибку скрипта, 404 обработчика, 500 сервера.'},
+{id:'w8',t:'web',k:'theory',q:'Что такое DNS?',
+ o:['Хостинг','Система, которая переводит домен в IP-адрес сервера','Сертификат безопасности','Почтовый сервер'],a:1,
+ e:'После смены DNS-записей домен может открываться по-старому до суток, пока обновляются кэши.'},
+{id:'w9',t:'web',k:'theory',q:'Метрика LCP из Core Web Vitals показывает…',
+ o:['Сдвиги вёрстки','Время отрисовки самого крупного элемента первого экрана','Время ответа сервера','Скорость отклика на клик'],a:1,
+ e:'LCP — загрузка, CLS — сдвиги вёрстки, INP — отзывчивость на действия. Хороший LCP — до 2,5 секунды.'},
+{id:'w10',t:'web',k:'code',q:'Что произойдёт?',code:`JSON.parse("{ name: 'Иван' }");`,out:'SyntaxError',
+ o:['Вернёт объект','SyntaxError','Вернёт строку','undefined'],a:1,
+ e:'В JSON ключи и строки обязательно в двойных кавычках: {"name": "Иван"}.'},
+
+// ---------- Git ----------
+{id:'g1',t:'git',k:'theory',q:'Правильный порядок, чтобы отправить изменения на GitHub?',
+ o:['git push → git commit → git add','git add → git commit → git push','git commit → git add → git push','git pull → git push'],a:1,
+ e:'add добавляет файлы в индекс, commit фиксирует снимок, push отправляет коммиты на сервер.'},
+{id:'g2',t:'git',k:'theory',q:'Что делает git pull?',
+ o:['Отправляет коммиты','Скачивает изменения с сервера и вливает их в текущую ветку','Удаляет ветку','Создаёт копию репозитория'],a:1,
+ e:'pull = fetch + merge. Если хочется сначала посмотреть изменения, делают git fetch.'},
+{id:'g3',t:'git',k:'theory',q:'Как создать новую ветку и сразу на неё переключиться?',
+ o:['git branch new','git switch -c new','git merge new','git push new'],a:1,
+ e:'Старый вариант той же команды: git checkout -b new.'},
+{id:'g4',t:'git',k:'case',q:'Сделал коммит с ошибкой и ещё не отправил его. Как отменить коммит, сохранив изменения в файлах?',
+ o:['git reset --soft HEAD~1','git reset --hard HEAD~1','Удалить папку .git','git push --force'],a:0,
+ e:'--soft отменяет коммит, а изменения остаются подготовленными. --hard удаляет изменения безвозвратно.'},
+{id:'g5',t:'git',k:'case',q:'Ошибочный коммит уже отправлен в общую ветку. Как безопасно отменить его?',
+ o:['git reset --hard и git push --force','git revert <хеш коммита>','Удалить репозиторий','Написать коллегам, чтобы не скачивали'],a:1,
+ e:'revert создаёт новый коммит с обратными изменениями и не переписывает историю, которую уже скачали другие.'},
+{id:'g6',t:'git',k:'theory',q:'Зачем нужен файл .gitignore?',
+ o:['Хранит пароли','Перечисляет файлы, которые Git не должен отслеживать: node_modules, .env, кэш','Отключает Git','Описывает проект'],a:1,
+ e:'Пароли и ключи (wp-config.php с данными базы, .env) никогда не должны попадать в репозиторий.'},
+{id:'g7',t:'git',k:'case',q:'При git pull возник конфликт. Что делать?',
+ o:['Удалить репозиторий и склонировать заново','Открыть файлы с конфликтом, выбрать нужные строки между <<<<<<< и >>>>>>>, затем git add и git commit','git push --force','Игнорировать'],a:1,
+ e:'Конфликт — это когда Git не знает, какую версию строк оставить. Решает человек, VS Code показывает удобные кнопки.'},
+{id:'g8',t:'git',k:'theory',q:'Что показывает git status?',
+ o:['Историю коммитов','Изменённые, подготовленные и неотслеживаемые файлы и текущую ветку','Список веток на сервере','Автора проекта'],a:1,
+ e:'История коммитов — это git log, удобно в виде git log --oneline.'},
+
+// ---------- WordPress и PHP ----------
+{id:'wp1',t:'wp',k:'theory',q:'Как правильно подключить свой CSS в теме WordPress?',
+ o:['Тегом link в header.php','Через wp_enqueue_style в functions.php на хуке wp_enqueue_scripts','Через @import в style.css','Вставить стили в каждый шаблон'],a:1,
+ e:'Так WordPress управляет зависимостями, версиями и порядком подключения, и плагины не дублируют библиотеки.'},
+{id:'wp2',t:'wp',k:'theory',q:'Какой шаблон WordPress использует для главной страницы, если он есть в теме?',
+ o:['index.php','front-page.php','page.php','home.html'],a:1,
+ e:'Иерархия шаблонов: front-page.php → home.php (лента записей) → index.php. Для страниц page.php, для записей single.php.'},
+{id:'wp3',t:'wp',k:'theory',q:'Чем get_field() отличается от the_field() в ACF?',
+ o:['Ничем','get_field возвращает значение, the_field сразу выводит его','the_field работает только в цикле','get_field устарел'],a:1,
+ e:'get_field нужен, когда значение надо проверить или обработать перед выводом: if ($phone = get_field("phone")) ...'},
+{id:'wp4',t:'wp',k:'theory',q:'Зачем нужна дочерняя тема?',
+ o:['Для мобильной версии','Чтобы правки не стёрлись при обновлении родительской темы','Для скорости','Для мультиязычности'],a:1,
+ e:'В дочерней теме переопределяют только нужные файлы, остальное берётся из родительской.'},
+{id:'wp5',t:'wp',k:'case',q:'После правки functions.php сайт показывает белый экран или «критическую ошибку». Что делать?',
+ o:['Переустановить WordPress','Через файловый менеджер хостинга или FTP откатить правку, включить WP_DEBUG и посмотреть ошибку','Удалить базу данных','Ждать, само пройдёт'],a:1,
+ e:'Чаще всего это синтаксическая ошибка: пропущенная точка с запятой или скобка. Поэтому крупные правки делают на копии сайта.'},
+{id:'wp6',t:'wp',k:'theory',q:'Какой функцией безопасно выводить текст из поля в HTML?',
+ o:['echo $text','echo esc_html($text)','print_r($text)','echo strip_tags($text)'],a:1,
+ e:'Для атрибутов esc_attr, для ссылок esc_url. Экранирование защищает от XSS.'},
+{id:'wp7',t:'wp',k:'case',q:'Сайт перенесли на новый домен, и в базе остались старые ссылки. Почему опасно делать замену простым SQL REPLACE?',
+ o:['Это не опасно','Часть данных хранится сериализованной, и при изменении длины строки она ломается','SQL не умеет заменять','База удалится'],a:1,
+ e:'Правильно: WP-CLI search-replace или плагин Better Search Replace, они учитывают сериализацию.'},
+{id:'wp8',t:'wp',k:'case',q:'Письма из формы Contact Form 7 не доходят до заказчика. Частое решение?',
+ o:['Переустановить CF7','Настроить отправку через SMTP (плагин WP Mail SMTP) с реальным почтовым ящиком','Сменить тему','Отключить кэш'],a:1,
+ e:'Стандартная функция mail() на хостинге часто попадает в спам или блокируется. SMTP отправляет письма через настоящий почтовый сервер.'},
+{id:'wp9',t:'wp',k:'theory',q:'Как вывести последние 3 записи произвольного типа «project»?',
+ o:['get_posts без параметров','new WP_Query([ "post_type" => "project", "posts_per_page" => 3 ])','query_posts("project")','SQL-запрос в шаблоне'],a:1,
+ e:'После своего цикла WP_Query вызывают wp_reset_postdata(), чтобы вернуть глобальный $post.'},
+{id:'wp10',t:'wp',k:'code',q:'Что выведет PHP-код?',code:`$name = 'Сергей';
+echo 'Привет, $name';`,out:'Привет, $name',
+ o:['Привет, Сергей','Привет, $name','Ошибку','Привет, '],a:1,
+ e:'В одинарных кавычках PHP не подставляет переменные. Подстановка работает в двойных: "Привет, $name".'},
+
+// ---------- Скорость и доступность ----------
+{id:'p1',t:'perf',k:'case',q:'PageSpeed ругается на тяжёлые картинки. Что сделать в первую очередь?',
+ o:['Удалить картинки','Сжать, перевести в WebP или AVIF и отдавать размер под экран через srcset','Поставить больше серверов','Добавить прелоадер'],a:1,
+ e:'Картинки обычно самая тяжёлая часть страницы. В WordPress помогают плагины конвертации в WebP.'},
+{id:'p2',t:'perf',k:'theory',q:'Какой минимальный контраст текста к фону рекомендует WCAG для обычного текста?',
+ o:['2:1','3:1','4.5:1','10:1'],a:2,
+ e:'Для крупного текста (от 24px или 18.66px жирным) достаточно 3:1. Проверяется в DevTools.'},
+{id:'p3',t:'perf',k:'case',q:'Кнопка закрытия меню — только иконка крестика. Как сделать её понятной скринридеру?',
+ o:['Добавить title','Добавить aria-label="Закрыть меню"','Сделать крестик больше','Никак'],a:1,
+ e:'Без текста скринридер прочитает просто «кнопка». aria-label даёт ей имя.'},
+{id:'p4',t:'perf',k:'case',q:'Пока грузится страница, контент прыгает вниз, когда появляются картинки. Как это исправить?',
+ o:['Убрать картинки','Задать картинкам width и height или aspect-ratio, чтобы место было зарезервировано','Добавить прелоадер','Использовать position: absolute'],a:1,
+ e:'Это метрика CLS. Браузер резервирует место заранее, если знает пропорции.'},
+{id:'p5',t:'perf',k:'theory',q:'Зачем учитывать prefers-reduced-motion?',
+ o:['Для экономии батареи','Часть людей отключает анимации в системе из-за укачивания, и сайт должен это уважать','Для SEO','Это нужно только для iOS'],a:1,
+ e:'В CSS: @media (prefers-reduced-motion: reduce) { ... } — отключаем или сокращаем анимации.'},
+{id:'p6',t:'perf',k:'case',q:'Дизайнеру не нравится обводка у кнопок при клике, и он просит outline: none. Как поступить?',
+ o:['Убрать везде','Убрать для мыши, но оставить видимый фокус для клавиатуры через :focus-visible','Сделать обводку прозрачной','Отключить фокус в JS'],a:1,
+ e:':focus-visible показывает фокус только при навигации с клавиатуры. Без него человек с клавиатурой не видит, где находится.'},
+{id:'p7',t:'perf',k:'theory',q:'Что значит «блокирующий рендер» скрипт?',
+ o:['Скрипт с ошибкой','Скрипт в head без defer или async: браузер останавливает разбор HTML, пока его не скачает и не выполнит','Скрипт аналитики','Скрипт внизу страницы'],a:1,
+ e:'Решение: defer, перенос вниз, отложенная загрузка неважных скриптов.'},
+{id:'p8',t:'perf',k:'theory',q:'Для чего нужен атрибут lang у тега html?',
+ o:['Для перевода страницы','Скринридер выбирает правильное произношение, браузер — переносы и проверку орфографии','Для SEO-ключей','Ни для чего'],a:1,
+ e:'Для русского сайта: html lang="ru".'},
+
+// ---------- React ----------
+{id:'r1',t:'react',k:'code',q:'count = 0. Чему будет равен count после клика?',code:`function handleClick() {
+  setCount(count + 1);
+  setCount(count + 1);
+}`,out:'1',
+ o:['2','1','0','Ошибка'],a:1,
+ e:'Оба вызова видят старое значение count = 0. Чтобы увеличить дважды, используют функцию: setCount(c => c + 1).'},
+{id:'r2',t:'react',k:'theory',q:'Зачем элементам списка нужен key?',
+ o:['Для стилей','Чтобы React понимал, какой элемент изменился, добавился или удалился','Для сортировки','Это необязательно'],a:1,
+ e:'key должен быть стабильным и уникальным, обычно id из данных. Индекс массива плох, если список меняется.'},
+{id:'r3',t:'react',k:'theory',q:'Когда сработает useEffect(() => {...}, [])?',
+ o:['При каждом рендере','Один раз после первого рендера','Никогда','Перед рендером'],a:1,
+ e:'Пустой массив зависимостей — эффект без зависимостей. Без массива эффект срабатывает после каждого рендера.'},
+{id:'r4',t:'react',k:'theory',q:'Чем props отличаются от state?',
+ o:['Ничем','props приходят от родителя и не меняются компонентом, state — внутреннее состояние компонента','state передают детям, props нельзя','props только для строк'],a:1,
+ e:'Если двум компонентам нужно одно состояние, его поднимают в общего родителя и передают через props.'},
+{id:'r5',t:'react',k:'code',q:'items = []. Что отрисует компонент?',code:`return <div>{items.length && <List items={items} />}</div>;`,out:'0',
+ o:['Ничего','Цифру 0','List с пустым списком','Ошибку'],a:1,
+ e:'0 — ложное значение, но React его рисует. Правильно: items.length > 0 && ... или тернарный оператор.'},
+{id:'r6',t:'react',k:'case',q:'Добавил товар в массив через items.push(newItem) и вызвал setItems(items), но список не обновился. Почему?',
+ o:['push не работает в React','Ссылка на массив та же, React считает, что состояние не изменилось. Нужен новый массив: setItems([...items, newItem])','Нужно перезагрузить страницу','Нужен useEffect'],a:1,
+ e:'Состояние в React меняют неизменяемо: создают новый объект или массив.'},
+{id:'r7',t:'react',k:'theory',q:'Как в JSX задать CSS-класс?',
+ o:['class="btn"','className="btn"','cssClass="btn"','styleClass="btn"'],a:1,
+ e:'class — зарезервированное слово в JavaScript. Аналогично htmlFor вместо for.'},
+{id:'r8',t:'react',k:'theory',q:'Что такое контролируемый input?',
+ o:['Input с валидацией','Input, значение которого хранится в state и задаётся через value и onChange','Input только для чтения','Input внутри form'],a:1,
+ e:'React становится единственным источником правды о значении поля.'},
+{id:'r9',t:'react',k:'case',q:'В useEffect подписался на событие resize окна. Что нужно не забыть?',
+ o:['Ничего','Вернуть из эффекта функцию очистки, которая снимет обработчик','Вызвать эффект ещё раз','Добавить key'],a:1,
+ e:'Иначе после ухода со страницы обработчики копятся и вызывают утечки памяти и ошибки.'},
+{id:'r10',t:'react',k:'theory',q:'Зачем нужен useMemo?',
+ o:['Для хранения состояния','Чтобы не пересчитывать тяжёлое значение на каждом рендере, пока не изменились зависимости','Для запросов к API','Для анимаций'],a:1,
+ e:'Использовать его стоит, когда расчёт действительно тяжёлый. Для простых вещей он только добавляет сложности.'},
+
+// ---------- Собеседование ----------
+{id:'hr1',t:'hr',k:'hr',q:'«Почему вы ушли с прошлой работы?» Какой ответ лучше?',
+ o:['«Там платили мало, и начальник был неприятный»','«Решил полностью перейти в разработку. Смены по 12 часов не давали развиваться, а заказы на сайты уже приносили результат»','«Просто надоело»','«Не хочу об этом говорить»'],a:1,
+ e:'Говорите о движении к цели, а не о бегстве от проблем. Бывшего работодателя не критикуют.'},
+{id:'hr2',t:'hr',k:'hr',q:'«Расскажите о себе». Как лучше начать?',
+ o:['С детства и школы','С короткого рассказа: кто вы сейчас, что умеете, лучший проект и почему пришли именно сюда','С хобби','С вопроса о зарплате'],a:1,
+ e:'Держите рассказ в 1–2 минуты по схеме «настоящее → опыт → почему вы здесь».'},
+{id:'hr3',t:'hr',k:'hr',q:'«Назовите вашу слабую сторону». Лучший ответ?',
+ o:['«Я перфекционист»','«Слабых сторон нет»','Реальная слабость и что вы с ней делаете: «Пока не работал с React в продакшене, поэтому делаю учебный проект и разбираю хуки»','«Опаздываю»'],a:2,
+ e:'«Перфекционист» звучит как заготовка. Честность плюс конкретный план показывают зрелость.'},
+{id:'hr4',t:'hr',k:'hr',q:'«Вы пользуетесь ИИ в работе?»',
+ o:['«Нет, никогда» (если это неправда)','«Да, для рутины и отладки. Код проверяю и могу объяснить каждую строку»','«Да, он пишет за меня весь код»','«А что такое ИИ?»'],a:1,
+ e:'Компании ценят умение работать с ИИ, если человек понимает результат. Скорее всего, сразу попросят объяснить свой код.'},
+{id:'hr5',t:'hr',k:'hr',q:'«Какие у вас зарплатные ожидания?»',
+ o:['«Сколько дадите»','Назвать вилку, основанную на рынке для вашего уровня, и уточнить, что важны ещё задачи и рост','Назвать сумму в три раза выше рынка','Отказаться отвечать'],a:1,
+ e:'Посмотрите вакансии на Хабр Карьере и hh для junior. Вилка оставляет место для разговора.'},
+{id:'hr6',t:'hr',k:'hr',q:'На техническом собеседовании вы не знаете ответа. Что делать?',
+ o:['Уверенно выдумать ответ','Честно сказать, что не сталкивались, и рассуждать вслух, как бы искали решение','Молчать','Сменить тему'],a:1,
+ e:'Интервьюеру важно, как вы думаете. Выдуманный ответ обычно сразу виден.'},
+{id:'hr7',t:'hr',k:'hr',q:'«Почему вы хотите работать у нас?»',
+ o:['«Мне нужна любая работа»','Связать продукт или проекты компании со своим опытом: «Вы делаете сайты на WordPress для бизнеса, я как раз этим занимаюсь и хочу расти в команде»','«У вас удалёнка»','«Не знаю, просто откликнулся»'],a:1,
+ e:'Перед собеседованием потратьте 15 минут на сайт и портфолио компании.'},
+{id:'hr8',t:'hr',k:'hr',q:'«У вас есть вопросы к нам?»',
+ o:['«Нет»','«Как устроено ревью кода? Какие задачи будут в первый месяц? Кто будет наставником?»','«Когда отпуск?»','«Сколько можно не работать?»'],a:1,
+ e:'Вопросы показывают интерес и помогают понять, подходит ли вам команда.'},
+{id:'hr9',t:'hr',k:'hr',q:'«Чем вы занимались с апреля?»',
+ o:['«Отдыхал»','«Работал на фрилансе: сделал сайты для подрядчика и преподавателя, у меня 7 отзывов на Профи.ру. Параллельно подтягивал JavaScript»','«Искал себя»','«Ничем»'],a:1,
+ e:'Пауза в резюме не проблема, если её заполняет конкретная деятельность.'},
+{id:'hr10',t:'hr',k:'hr',q:'«Расскажите о сложной ситуации с заказчиком». По какой схеме строить ответ?',
+ o:['Пожаловаться на заказчика','Ситуация → задача → что вы сделали → результат (STAR)','Сказать, что сложных ситуаций не было','Рассказать чужую историю'],a:1,
+ e:'Например: заказчик менял требования → предложил согласовать структуру заранее → сдал в срок → получил отзыв.'},
+{id:'hr11',t:'hr',k:'hr',q:'«Как вы совмещаете работу с магистратурой?»',
+ o:['«Учёба на первом месте»','Конкретно: в какое время учёба, сколько часов в день готовы работать и как планируете неделю','«Буду прогуливать пары»','«Пока не думал»'],a:1,
+ e:'Работодателю важно понимать вашу доступность. Отвечайте цифрами: часы, дни, время на связи.'},
+];
+
+// Памятка
+const NOTES = [
+{t:'js',h:'Сравнение',b:'Всегда используй === и !==. Нестрогое == приводит типы: 0 == "" и null == undefined дают true.'},
+{t:'js',h:'Ложные значения',b:'false, 0, "", null, undefined, NaN. Всё остальное истинно, включая "0", [] и {}.'},
+{t:'js',h:'Копирование объектов',b:'Спред {...obj} копирует только первый уровень. Глубокая копия:',c:'const copy = structuredClone(obj);'},
+{t:'js',h:'Методы массивов',b:'map — преобразовать каждый, filter — отобрать, find — первый подходящий, reduce — свести к одному значению, some/every — проверить условие.',c:'const sum = prices.reduce((s, p) => s + p, 0);'},
+{t:'js',h:'Замыкание',b:'Функция помнит переменные места, где её создали. Так делают счётчики, приватные данные и обработчики с параметрами.'},
+{t:'js',h:'|| против ??',b:'a || b берёт b для любого ложного a (включая 0). a ?? b — только для null и undefined.'},
+{t:'async',h:'Порядок выполнения',b:'Синхронный код → микрозадачи (then, await) → макрозадачи (setTimeout, события).'},
+{t:'async',h:'fetch с проверкой',b:'fetch не падает на 404 и 500, статус проверяем сами.',c:`async function load(url) {
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  return res.json();
+}`},
+{t:'async',h:'Promise.all и allSettled',b:'all — все результаты или первая ошибка. allSettled — статус каждого промиса, без падения.'},
+{t:'dom',h:'Делегирование событий',b:'Один обработчик на родителе вместо сотни на детях. Работает и для элементов, добавленных позже.',c:`list.addEventListener('click', (e) => {
+  const btn = e.target.closest('.delete');
+  if (btn) btn.closest('li').remove();
+});`},
+{t:'dom',h:'textContent и innerHTML',b:'Данные пользователя выводим только через textContent. innerHTML с чужим текстом — дыра для XSS.'},
+{t:'dom',h:'localStorage',b:'Хранит только строки.',c:`localStorage.setItem('cart', JSON.stringify(cart));
+const cart = JSON.parse(localStorage.getItem('cart') || '[]');`},
+{t:'html',h:'Семантика',b:'header, nav, main, section, article, aside, footer. Один h1 на странице, уровни заголовков без пропусков.'},
+{t:'html',h:'Формы',b:'label for + id, правильный type (tel, email), autocomplete, required. Кнопка отправки — button type="submit".'},
+{t:'html',h:'Картинки',b:'alt всегда, width и height против прыжков, loading="lazy" ниже первого экрана, srcset под разные экраны.'},
+{t:'css',h:'Центрирование',b:'Самое короткое:',c:`.parent { display: grid; place-items: center; }`},
+{t:'css',h:'Специфичность',b:'inline-стиль > #id > .class, [атрибут], :hover > тег. При равенстве побеждает правило ниже в файле. !important — крайняя мера.'},
+{t:'css',h:'Адаптивная сетка без медиазапросов',b:'Колонки сами переносятся:',c:`.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 24px;
+}`},
+{t:'css',h:'Горизонтальный скролл',b:'Ищи элемент шире экрана: картинка без max-width: 100%, фиксированная ширина, flex-ребёнок без min-width: 0, длинное слово без overflow-wrap.'},
+{t:'css',h:'Плавная анимация',b:'Анимируй transform и opacity. Уважай настройку системы:',c:`@media (prefers-reduced-motion: reduce) {
+  * { animation: none !important; transition: none !important; }
+}`},
+{t:'web',h:'Коды ответа',b:'200 OK · 301 переезд навсегда · 304 из кэша · 403 нет доступа · 404 не найдено · 500 ошибка сервера · 502/504 сервер не ответил.'},
+{t:'web',h:'Отладка в DevTools',b:'Console — ошибки JS. Network — запросы и ответы. Elements — вёрстка и стили. Lighthouse — скорость и доступность.'},
+{t:'web',h:'Кэш',b:'Изменения не видно → жёсткая перезагрузка (Ctrl+Shift+R, на Mac Cmd+Shift+R), очистка кэширующего плагина, версия файла в ссылке.'},
+{t:'git',h:'Базовый цикл',b:'Каждый день:',c:`git status
+git add .
+git commit -m "Добавил форму заявки"
+git push`},
+{t:'git',h:'Отмена',b:'Не отправлен: git reset --soft HEAD~1. Уже в общей ветке: git revert <хеш>. Отменить правки в файле: git restore файл.'},
+{t:'git',h:'Ветки',b:'Новая задача — новая ветка:',c:`git switch -c feature/contact-form
+# ...работа...
+git push -u origin feature/contact-form`},
+{t:'wp',h:'Подключение стилей и скриптов',b:'Только через functions.php:',c:`add_action('wp_enqueue_scripts', function () {
+  wp_enqueue_style('main', get_stylesheet_directory_uri() . '/style.css', [], '1.0');
+  wp_enqueue_script('app', get_stylesheet_directory_uri() . '/app.js', [], '1.0', true);
+});`},
+{t:'wp',h:'Иерархия шаблонов',b:'Главная: front-page.php → home.php → index.php. Страница: page-{slug}.php → page.php. Запись: single-{type}.php → single.php.'},
+{t:'wp',h:'Экранирование',b:'esc_html — текст, esc_attr — атрибуты, esc_url — ссылки, wp_kses_post — разрешённый HTML.'},
+{t:'wp',h:'Белый экран',b:'Откатить последнюю правку через файловый менеджер хостинга. В wp-config.php:',c:`define('WP_DEBUG', true);
+define('WP_DEBUG_LOG', true);
+define('WP_DEBUG_DISPLAY', false);`},
+{t:'perf',h:'Быстрый первый экран',b:'Картинки в WebP или AVIF, размеры под экран, defer у скриптов, шрифты с display=swap, без тяжёлых слайдеров на первом экране.'},
+{t:'perf',h:'Доступность за 5 минут',b:'Контраст 4.5:1, alt у картинок, label у полей, aria-label у кнопок-иконок, видимый :focus-visible, lang="ru".'},
+{t:'react',h:'Состояние',b:'Меняй неизменяемо, новое значение считай от предыдущего:',c:`setItems(prev => [...prev, item]);
+setCount(c => c + 1);`},
+{t:'react',h:'useEffect',b:'[] — один раз после монтирования. [x] — когда меняется x. Подписки снимай в функции очистки.',c:`useEffect(() => {
+  const onResize = () => setW(window.innerWidth);
+  window.addEventListener('resize', onResize);
+  return () => window.removeEventListener('resize', onResize);
+}, []);`},
+{t:'react',h:'Списки',b:'key — стабильный id из данных, не индекс массива. Условный рендер: count > 0 && ..., а не count && ...'},
+{t:'hr',h:'Рассказ о себе за минуту',b:'Кто я сейчас: frontend и WordPress, фриланс, 7 отзывов. Лучший проект и результат. Почему ищу команду: хочу расти, нужны ревью и сложные задачи.'},
+{t:'hr',h:'Схема STAR',b:'Ситуация → Задача → Действие → Результат. Подходит для вопросов про сложности, ошибки и конфликты.'},
+{t:'hr',h:'Вопросы работодателю',b:'Какие задачи в первый месяц? Как устроено ревью кода? Кто наставник? Как оценивают результат на испытательном сроке?'},
+];
+
+
+
+// Второй пакет: вопросы под навыки из резюме. w — почему неверен каждый вариант (null у правильного).
+const QUESTIONS2 = [
+// ---------- WordPress ----------
+{id:'wp11',t:'wp',k:'theory',q:'Чем action отличается от filter в WordPress?',
+ o:['Ничем','action выполняет код в нужный момент, filter получает значение, меняет его и обязан вернуть','filter только для админки','action возвращает значение, filter нет'],a:1,
+ e:'add_action("wp_footer", ...) — вставить что-то. add_filter("the_title", fn) — изменить и вернуть заголовок.',
+ w:['Разница принципиальная: filter обязан вернуть значение.',null,'Фильтры работают везде: для контента, заголовков, запросов.','Наоборот: возвращает значение filter.']},
+{id:'wp12',t:'wp',k:'case',q:'Создал произвольный тип записей «Услуги», а страницы услуг открываются с ошибкой 404. Что сделать первым?',
+ o:['Переустановить тему','Зайти в Настройки → Постоянные ссылки и нажать «Сохранить», чтобы обновить правила ссылок','Удалить записи','Сменить хостинг'],a:1,
+ e:'После регистрации нового типа записей правила перезаписи нужно обновить. Сохранение настроек ссылок делает flush_rewrite_rules.',
+ w:['Тема ни при чём, правила ссылок просто не обновились.',null,'Записи в порядке, не хватает правил ссылок для нового типа.','Хостинг не связан с правилами WordPress.']},
+{id:'wp13',t:'wp',k:'theory',q:'Какой функцией регистрируют произвольный тип записей?',
+ o:['add_post_type()','register_post_type() на хуке init','new PostType()','wp_insert_post()'],a:1,
+ e:'register_post_type("service", [...]) вызывают на хуке init. Таксономии — register_taxonomy.',
+ w:['Такой функции в WordPress нет.',null,'Классов для регистрации типов в ядре нет.','wp_insert_post создаёт запись, а не тип записей.']},
+{id:'wp14',t:'wp',k:'case',q:'Нужен блок «Преимущества», где заказчик сам добавляет любое количество пунктов с иконкой и текстом. Какое поле ACF подходит?',
+ o:['Текст','Повторитель (Repeater)','Чекбокс','Ссылка'],a:1,
+ e:'Repeater создаёт набор подполей, которые можно повторять. Выводится циклом have_rows() / the_row().',
+ w:['Одно текстовое поле не даёт набор пунктов с иконкой.',null,'Чекбокс выбирает из готовых вариантов, а не добавляет свои пункты.','Ссылка хранит один URL.']},
+{id:'wp15',t:'wp',k:'case',q:'Телефон и адрес компании выводятся в шапке и подвале на всех страницах. Где удобнее дать заказчику их редактировать?',
+ o:['В каждой странице отдельно','На странице настроек ACF (Options Page) и выводить через get_field("phone", "option")','Прямо в коде header.php','В виджете «Текст»'],a:1,
+ e:'Options Page — одно место для общих данных сайта. Заказчик меняет телефон один раз.',
+ w:['Придётся менять на каждой странице, и данные разъедутся.',null,'Заказчик не сможет поменять телефон без программиста.','Виджеты есть не во всех темах и неудобны для структурированных данных.']},
+{id:'wp16',t:'wp',k:'theory',q:'Для чего нужен wp_nonce в формах и AJAX-запросах WordPress?',
+ o:['Для кэширования','Защита от подделки запроса (CSRF): сервер проверяет, что запрос пришёл с твоего сайта','Для SEO','Для ускорения'],a:1,
+ e:'Создают wp_create_nonce("action"), проверяют check_ajax_referer или wp_verify_nonce.',
+ w:['К кэшированию nonce не относится.',null,'На поисковую оптимизацию nonce не влияет.','Проверка nonce не ускоряет запрос.']},
+{id:'wp17',t:'wp',k:'theory',q:'Как передать из PHP в JavaScript адрес admin-ajax.php и nonce?',
+ o:['Вписать адрес вручную в JS','wp_localize_script или wp_add_inline_script после подключения скрипта','Через cookie','Через localStorage'],a:1,
+ e:'Например: wp_localize_script("app", "site", ["ajax" => admin_url("admin-ajax.php"), "nonce" => wp_create_nonce("form")]).',
+ w:['Ручной адрес сломается при переезде сайта, и nonce так не передать.',null,'Cookie не предназначены для этого и усложняют код.','localStorage заполняется из JS, у PHP к нему доступа нет.']},
+{id:'wp18',t:'wp',k:'case',q:'На сайт заказчика попал вредоносный код: появились редиректы на чужие сайты. Что делать первым?',
+ o:['Удалить сайт','Сделать бэкап, сменить все пароли (хостинг, FTP, админка, база), проверить файлы и базу сканером, обновить ядро, тему и плагины','Просто удалить подозрительный плагин','Поставить капчу'],a:1,
+ e:'Важно закрыть причину заражения: устаревшие плагины, слабые пароли, «нулёванные» темы. Иначе вирус вернётся.',
+ w:['Удаление сайта уничтожит контент и не закроет дыру в доступах.',null,'Вредоносный код обычно сидит в нескольких местах: в файлах ядра, uploads и базе.','Капча защищает формы, а не закрывает уже существующий взлом.']},
+{id:'wp19',t:'wp',k:'theory',q:'Что делает get_template_part("parts/card")?',
+ o:['Создаёт шаблон','Подключает файл parts/card.php из темы, так переиспользуют куски разметки','Удаляет часть шаблона','Загружает CSS'],a:1,
+ e:'Удобно для карточек, блоков и секций. Третьим аргументом можно передать данные в шаблон.',
+ w:['Функция ничего не создаёт, она подключает готовый файл.',null,'Удалять она ничего не умеет.','Стили подключают через wp_enqueue_style.']},
+{id:'wp20',t:'wp',k:'theory',q:'Как вывести меню, созданное в админке, в шаблоне?',
+ o:['Написать ul вручную','wp_nav_menu(["theme_location" => "header"]) после register_nav_menus','get_menu()','the_menu()'],a:1,
+ e:'Тогда заказчик меняет пункты меню в Внешний вид → Меню, и код трогать не нужно.',
+ w:['Ручное меню заказчик не сможет менять.',null,'Такой функции в ядре нет.','Такой функции в ядре нет.']},
+{id:'wp21',t:'wp',k:'case',q:'После обновления плагина на сайте сломалась вёрстка. Как быстро найти виновника?',
+ o:['Удалить все плагины навсегда','Отключать плагины по одному (лучше на копии сайта) и смотреть, когда проблема исчезнет','Переустановить WordPress','Сменить тему навсегда'],a:1,
+ e:'Это метод исключения. Помогает плагин Health Check, он отключает плагины только для тебя.',
+ w:['Удаление всех плагинов сломает функциональность сайта.',null,'Ядро обычно ни при чём, проблема в конфликте плагина.','Смена темы — крайняя мера, сначала ищут конкретный конфликт.']},
+{id:'wp22',t:'wp',k:'theory',q:'Где в WordPress хранятся данные для подключения к базе?',
+ o:['functions.php','wp-config.php','.htaccess','index.php'],a:1,
+ e:'Поэтому wp-config.php никогда не кладут в публичный репозиторий.',
+ w:['functions.php — файл темы, настроек базы там нет.',null,'.htaccess отвечает за правила сервера Apache.','index.php только запускает WordPress.']},
+{id:'wp23',t:'wp',k:'theory',q:'Как получить URL миниатюры записи нужного размера?',
+ o:['the_content()','get_the_post_thumbnail_url($id, "large")','get_field("image")','wp_get_image()'],a:1,
+ e:'Свои размеры добавляют через add_image_size, а the_post_thumbnail выводит сразу тег img со srcset.',
+ w:['the_content выводит содержимое записи.',null,'Это поле ACF, а не миниатюра записи.','Такой функции нет.']},
+{id:'wp24',t:'wp',k:'theory',q:'Что такое шорткод в WordPress?',
+ o:['Горячая клавиша','Метка в квадратных скобках вроде [contact-form-7 id="5"], которую PHP-функция заменяет на разметку','Короткая ссылка','Сжатый код'],a:1,
+ e:'Свои шорткоды регистрируют через add_shortcode("name", function() { return "..."; }). Функция возвращает строку, а не выводит её.',
+ w:['К клавиатуре шорткоды не относятся.',null,'Короткие ссылки — это другое.','Минификация кода — это другое.']},
+{id:'wp25',t:'wp',k:'case',q:'Сайт на WordPress медленно открывается. Что из этого обычно даёт самый большой эффект?',
+ o:['Удалить все записи','Кэширующий плагин, сжатие картинок, удаление лишних плагинов и тяжёлых слайдеров','Сменить тему оформления админки','Отключить комментарии'],a:1,
+ e:'Начинают с замера PageSpeed и вкладки Network: видно, что именно тяжёлое.',
+ w:['Контент не главная причина медленной загрузки.',null,'Админка не влияет на скорость сайта для посетителей.','Комментарии редко бывают главной причиной.']},
+{id:'wp26',t:'wp',k:'theory',q:'Что вернёт get_field() из ACF, если поле пустое?',
+ o:['Ошибку','false, null или пустое значение — поэтому перед выводом делают проверку','Строку "empty"','0 всегда'],a:1,
+ e:'Пример: if ($phone = get_field("phone")) { echo esc_html($phone); }',
+ w:['ACF не бросает ошибку на пустых полях.',null,'Такой строки ACF не возвращает.','Значение зависит от типа поля.']},
+{id:'wp27',t:'wp',k:'theory',q:'Как правильно перенести сайт с Local на хостинг?',
+ o:['Скопировать только папку темы','Перенести файлы и базу (плагин миграции или вручную), затем заменить адреса сайта в базе с учётом сериализации','Скопировать только базу','Переустановить WordPress и настроить заново'],a:1,
+ e:'Плагины вроде All-in-One WP Migration или Duplicator делают всё в одном архиве.',
+ w:['Без базы пропадут страницы, настройки и контент.',null,'Без файлов не будет темы, плагинов и загрузок.','Настройка с нуля долгая, и легко что-то потерять.']},
+
+// ---------- Хостинг ----------
+{id:'w11',t:'web',k:'theory',q:'Для чего нужна A-запись в DNS?',
+ o:['Для почты','Связывает домен с IP-адресом сервера','Для SSL','Для поддоменов почты'],a:1,
+ e:'MX — почта, CNAME — псевдоним другого домена, TXT — проверки и SPF.',
+ w:['Почтой занимаются MX-записи.',null,'SSL-сертификат выпускается отдельно, DNS лишь подтверждает домен.','Поддомены создаются A или CNAME-записями, к почте это не относится.']},
+{id:'w12',t:'web',k:'case',q:'Нужно поставить бесплатный SSL на сайт на хостинге с cPanel. Что обычно делают?',
+ o:['Покупают дорогой сертификат','Включают Let\'s Encrypt (AutoSSL) в панели и настраивают редирект с http на https','Пишут в поддержку браузера','Ничего, SSL не нужен'],a:1,
+ e:'После включения проверяют, что все ресурсы грузятся по https, иначе будет Mixed Content.',
+ w:['Для обычного сайта хватает бесплатного Let\'s Encrypt.',null,'Браузеры не выдают сертификаты.','Без SSL браузер помечает сайт как небезопасный.']},
+{id:'w13',t:'web',k:'theory',q:'Для чего phpMyAdmin?',
+ o:['Для редактирования PHP-файлов','Веб-интерфейс для работы с базой MySQL: таблицы, запросы, экспорт и импорт','Для почты','Для SSL'],a:1,
+ e:'Через phpMyAdmin делают дамп базы перед большими изменениями.',
+ w:['PHP-файлы редактируют в файловом менеджере или по FTP.',null,'Почта настраивается отдельно.','SSL настраивается в панели хостинга.']},
+{id:'w14',t:'web',k:'theory',q:'Что делает 301-редирект?',
+ o:['Временно перенаправляет','Постоянно перенаправляет на новый адрес и передаёт ему вес в поиске','Блокирует страницу','Ускоряет сайт'],a:1,
+ e:'Нужен при смене адресов страниц и переезде на https, чтобы не потерять позиции в поиске.',
+ w:['Временный редирект — 302.',null,'Блокировка — это 403 или 404.','Редирект добавляет запрос, а не ускоряет.']},
+
+// ---------- DOM / интерактив ----------
+{id:'dom11',t:'dom',k:'case',q:'Нужно, чтобы блоки плавно появлялись, когда пользователь до них доскроллит. Какой инструмент лучше?',
+ o:['Проверять window.scrollY в обработчике scroll на каждый пиксель','IntersectionObserver','setInterval','CSS :hover'],a:1,
+ e:'IntersectionObserver сообщает, когда элемент попал в видимую область, и не нагружает страницу на каждом кадре прокрутки.',
+ w:['Обработчик scroll срабатывает очень часто и тормозит страницу.',null,'Таймер тратит ресурсы, даже когда ничего не происходит.',':hover реагирует на мышь, а не на прокрутку.']},
+{id:'dom12',t:'dom',k:'theory',q:'Как сделать плавную прокрутку к блоку по клику?',
+ o:['window.location = "#block"','el.scrollIntoView({ behavior: "smooth" }) или html { scroll-behavior: smooth }','el.focus()','window.scroll = el'],a:1,
+ e:'Для фиксированной шапки добавляют scroll-margin-top блоку, чтобы заголовок не прятался.',
+ w:['Переход по якорю будет мгновенным, без плавности.',null,'focus переносит фокус, а прокрутка может быть резкой.','Такое присваивание ничего не делает.']},
+{id:'dom13',t:'dom',k:'theory',q:'Как правильно подключить Swiper на странице?',
+ o:['Только CSS','Подключить CSS и JS библиотеки, сделать разметку swiper → swiper-wrapper → swiper-slide и вызвать new Swiper(".swiper", {...})','Только разметку','Через jQuery обязательно'],a:1,
+ e:'В WordPress файлы Swiper подключают через wp_enqueue_style и wp_enqueue_script, а инициализацию кладут в свой скрипт.',
+ w:['Без JS слайдер не заработает.',null,'Без библиотеки разметка останется обычным списком.','Swiper не зависит от jQuery.']},
+{id:'dom14',t:'dom',k:'case',q:'Слайдер Swiper криво отображается внутри вкладки, которая была скрыта при загрузке. Как исправить?',
+ o:['Удалить вкладки','Вызвать swiper.update() после показа вкладки или включить observer: true, observeParents: true','Перезагрузить страницу','Увеличить z-index'],a:1,
+ e:'В скрытом блоке у слайдера нулевая ширина, и он не может посчитать размеры слайдов.',
+ w:['Вкладки не виноваты, Swiper надо пересчитать.',null,'Перезагрузка не поможет, вкладка снова будет скрыта.','z-index не влияет на расчёт ширины слайдов.']},
+{id:'dom15',t:'dom',k:'theory',q:'Зачем нужен debounce для обработчика resize или input?',
+ o:['Чтобы ускорить событие','Чтобы функция сработала один раз после паузы, а не сотни раз подряд','Чтобы отменить событие','Для анимаций'],a:1,
+ e:'Например, поиск по мере ввода отправляет запрос через 300 мс после последнего нажатия.',
+ w:['debounce не ускоряет событие, он сокращает число вызовов.',null,'Событие не отменяется, вызов откладывается.','С анимациями обычно работают через requestAnimationFrame.']},
+{id:'dom16',t:'dom',k:'theory',q:'Как отправить данные формы через fetch, не перечисляя каждое поле?',
+ o:['JSON.stringify(form)','new FormData(form) и передать в body','form.toString()','form.values'],a:1,
+ e:'fetch(url, { method: "POST", body: new FormData(form) }). Сервер получит поля как при обычной отправке формы.',
+ w:['DOM-элемент нельзя сериализовать в JSON напрямую.',null,'toString вернёт "[object HTMLFormElement]".','У формы нет свойства values.']},
+{id:'dom17',t:'dom',k:'case',q:'Форма отправляется через fetch, а пользователь жмёт кнопку несколько раз, и приходит несколько заявок. Как поступить?',
+ o:['Ничего не делать','Блокировать кнопку (disabled) на время отправки и показывать состояние «Отправляем…»','Убрать кнопку','Отправлять форму по таймеру'],a:1,
+ e:'После ответа кнопку разблокируют и показывают понятное сообщение об успехе или ошибке.',
+ w:['Дубли заявок раздражают заказчика.',null,'Без кнопки форму не отправить.','Таймер не решает проблему повторных кликов.']},
+{id:'dom18',t:'dom',k:'theory',q:'Чем requestAnimationFrame лучше setInterval для анимации?',
+ o:['Ничем','Синхронизирован с отрисовкой экрана и останавливается в неактивной вкладке','Работает быстрее процессора','Не требует функции'],a:1,
+ e:'Но проще всего анимировать через CSS transition и animation, а JS только переключает классы.',
+ w:['Разница есть: синхронизация с кадрами.',null,'Скорость ограничена частотой экрана, а не процессором.','Функция-колбэк обязательна.']},
+{id:'dom19',t:'dom',k:'case',q:'Мобильное меню открывается по кнопке-бургеру. Что нужно для доступности?',
+ o:['Ничего','aria-expanded на кнопке, закрытие по Escape и возврат фокуса на кнопку','Только иконка','Только анимация'],a:1,
+ e:'aria-controls связывает кнопку с меню, а aria-label даёт кнопке имя, если на ней только иконка.',
+ w:['Без этого меню неудобно с клавиатурой и скринридером.',null,'Иконка без подписи непонятна скринридеру.','Анимация не делает меню доступным.']},
+{id:'dom20',t:'dom',k:'code',q:'Что выведет код?',code:`const btn = document.createElement('button');
+btn.addEventListener('click', () => console.log('A'), { once: true });
+btn.click();
+btn.click();`,out:'A',
+ o:['A A','A','Ничего','Ошибку'],a:1,
+ e:'Опция once: true снимает обработчик после первого срабатывания.',
+ w:['После первого клика обработчик удалён.',null,'Первый клик обработчик всё же вызывает.','Программный click() — обычное событие.']},
+
+// ---------- JavaScript ----------
+{id:'js29',t:'js',k:'code',q:'Что выведет код?',code:`const d = new Date(2026, 0, 15);
+console.log(d.getMonth());`,out:'0',
+ o:['1','0','15','2026'],a:1,
+ e:'Месяцы в Date считаются с нуля: январь — 0, декабрь — 11. А дни месяца — с единицы.',
+ w:['Это частая ошибка: январь в Date — 0.',null,'15 вернёт getDate().','Год вернёт getFullYear().']},
+{id:'js30',t:'js',k:'code',q:'Что выведет код?',code:`const tags = ['css', 'js', 'css', 'html'];
+console.log([...new Set(tags)].length);`,out:'3',
+ o:['4','3','2','1'],a:1,
+ e:'Set хранит только уникальные значения. Так быстро убирают дубли из массива.',
+ w:['Повтор "css" Set отбросит.',null,'Уникальных значений три: css, js, html.','Уникальных значений больше одного.']},
+{id:'js31',t:'js',k:'code',q:'Что выведет код?',code:`console.log(JSON.stringify({ a: 1, b: undefined }));`,out:'{"a":1}',
+ o:['{"a":1,"b":undefined}','{"a":1}','{"a":1,"b":null}','Ошибку'],a:1,
+ e:'JSON не умеет хранить undefined, такие поля при сериализации просто пропадают.',
+ w:['undefined нет в формате JSON.',null,'null подставляется для undefined только внутри массивов.','Ошибки нет, поле молча пропадает.']},
+{id:'js32',t:'js',k:'code',q:'Что выведет код?',code:`console.log('10' < '9');`,out:'true',
+ o:['true','false','NaN','Ошибку'],a:0,
+ e:'Строки сравниваются посимвольно: "1" меньше "9". Чтобы сравнить числа, строки сначала переводят в числа.',
+ w:[null,'Как числа 10 > 9, но здесь сравниваются строки.','Сравнение возвращает только true или false.','Сравнение строк — допустимая операция.']},
+{id:'js33',t:'js',k:'code',q:'Что выведет код?',code:`const arr = [1, 2, 3, 4, 5];
+const part = arr.slice(1, 3);
+console.log(part, arr.length);`,out:'[2,3] 5',
+ o:['[2, 3] 5','[2, 3, 4] 5','[2, 3] 3','[1, 2] 5'],a:0,
+ e:'slice(начало, конец) копирует элементы до конца не включительно и не меняет исходный массив. splice меняет.',
+ w:[null,'Конечный индекс 3 не входит в результат.','slice не меняет исходный массив, в нём по-прежнему 5 элементов.','Индексы начинаются с нуля, slice(1) начинает со второго элемента.']},
+{id:'js34',t:'js',k:'code',q:'Что выведет код?',code:`const arr = [1, 2, 3, 4, 5];
+arr.splice(1, 2);
+console.log(arr);`,out:'[1,4,5]',
+ o:['[2, 3]','[1, 4, 5]','[1, 2, 3, 4, 5]','[3, 4, 5]'],a:1,
+ e:'splice(начало, количество) удаляет элементы из исходного массива и возвращает удалённые.',
+ w:['[2, 3] — это то, что вернёт splice, а выводится сам массив.',null,'splice изменяет массив на месте.','Удаляются два элемента, начиная с индекса 1 (числа 2 и 3).']},
+{id:'js35',t:'js',k:'code',q:'Что выведет код?',code:`const { name = 'Гость', age } = { age: 30 };
+console.log(name, age);`,out:'Гость 30',
+ o:['undefined 30','Гость 30','Гость undefined','Ошибку'],a:1,
+ e:'При деструктуризации можно задать значение по умолчанию. Оно подставится, если поля нет.',
+ w:['Значение по умолчанию подставляется для отсутствующего name.',null,'age есть в объекте и равен 30.','Деструктуризация с умолчаниями — обычный синтаксис.']},
+{id:'js36',t:'js',k:'code',q:'Что выведет код?',code:`console.log(typeof NaN);`,out:'number',
+ o:['"NaN"','"number"','"undefined"','"object"'],a:1,
+ e:'NaN — «не число», но по типу это number. Он получается при неудачных математических операциях.',
+ w:['Типа "NaN" не существует.',null,'NaN — определённое значение.','object вернул бы typeof null.']},
+{id:'js37',t:'js',k:'code',q:'Что выведет код?',code:`const users = [{ n: 'Аня', a: 25 }, { n: 'Олег', a: 17 }];
+console.log(users.find(u => u.a >= 18).n);`,out:'Аня',
+ o:['Аня','Олег','["Аня"]','undefined'],a:0,
+ e:'find возвращает первый подходящий элемент, а не массив. filter вернул бы массив всех подходящих.',
+ w:[null,'Олегу 17, он не проходит условие.','Массив вернул бы filter.','Подходящий элемент есть — Аня.']},
+{id:'js38',t:'js',k:'code',q:'Что выведет код?',code:`console.log([10, 1, 3].some(n => n > 5), [10, 1, 3].every(n => n > 5));`,out:'true false',
+ o:['true true','true false','false false','false true'],a:1,
+ e:'some — хотя бы один элемент подходит. every — подходят все.',
+ w:['every требует, чтобы все были больше 5, а 1 и 3 меньше.',null,'some находит 10.','Наоборот: some — true, every — false.']},
+{id:'js39',t:'js',k:'code',q:'Что выведет код?',code:`const s = '  Привет  ';
+console.log(s.trim().length);`,out:'6',
+ o:['10','6','8','2'],a:1,
+ e:'trim убирает пробелы по краям строки. В слове «Привет» 6 букв.',
+ w:['10 — длина вместе с пробелами.',null,'trim убирает все пробелы по краям, а не по одному.','Длину считают по символам слова.']},
+{id:'js40',t:'js',k:'code',q:'Что выведет код?',code:`const price = 1999.5;
+console.log(price.toFixed(0), typeof price.toFixed(0));`,out:'2000 string',
+ o:['2000 number','2000 string','1999 string','1999.5 number'],a:1,
+ e:'toFixed округляет и возвращает строку. Для расчётов результат переводят обратно: Number(...).',
+ w:['toFixed возвращает строку, а не число.',null,'toFixed округляет по правилам математики, 1999.5 → 2000.','Число отформатировано, тип изменился на string.']},
+{id:'js41',t:'js',k:'code',q:'Что выведет код?',code:`console.log(Array.from({ length: 3 }, (_, i) => i * 2));`,out:'[0,2,4]',
+ o:['[0, 2, 4]','[2, 4, 6]','[undefined, undefined, undefined]','[0, 1, 2]'],a:0,
+ e:'Array.from создаёт массив нужной длины, а вторая функция задаёт значение каждому элементу по индексу.',
+ w:[null,'Индексы начинаются с 0, поэтому первый элемент 0.','Функция-заполнитель подставляет значения.','Каждый индекс умножается на 2.']},
+{id:'js42',t:'js',k:'code',q:'Что выведет код?',code:`const user = { name: 'Аня', greet() { return 'Я ' + this.name; } };
+console.log(user.greet());`,out:'Я Аня',
+ o:['Я Аня','Я undefined','Ошибку','Я '],a:0,
+ e:'При вызове user.greet() this указывает на объект слева от точки.',
+ w:[null,'this здесь — объект user, у него есть name.','Вызов метода объекта корректен.','name подставляется из объекта.']},
+{id:'js43',t:'js',k:'theory',q:'Чем стрелочная функция отличается от обычной в работе с this?',
+ o:['Ничем','У стрелочной функции нет своего this, она берёт его из окружающего кода','Стрелочная всегда указывает на window','У стрелочной this — это сама функция'],a:1,
+ e:'Поэтому стрелки удобны в колбэках внутри методов, но не подходят как методы объекта, если нужен this объекта.',
+ w:['Разница есть, и она частый вопрос на собеседовании.',null,'this берётся из внешнего кода, это не обязательно window.','Функция сама себе не this.']},
+{id:'js44',t:'js',k:'theory',q:'Что такое замыкание?',
+ o:['Закрытие вкладки','Функция вместе с доступом к переменным места, где её создали','Приватный класс','Ошибка в коде'],a:1,
+ e:'Пример: обработчик клика помнит переменную из функции, в которой его создали, даже когда та функция уже завершилась.',
+ w:['К вкладкам браузера это не относится.',null,'Замыкание — не класс, хотя с его помощью делают приватные данные.','Это нормальное поведение языка.']},
+{id:'js45',t:'js',k:'code',q:'Что выведет код?',code:`const a = [1, 2];
+const b = [...a, 3];
+a.push(9);
+console.log(b);`,out:'[1,2,3]',
+ o:['[1, 2, 3]','[1, 2, 9, 3]','[1, 2, 3, 9]','[9]'],a:0,
+ e:'Спред создаёт новый массив. Изменение a после копирования на b не влияет.',
+ w:[null,'b создан до push и не связан с a.','b — отдельный массив.','b содержит скопированные элементы.']},
+
+// ---------- CSS ----------
+{id:'c16',t:'css',k:'theory',q:'Что делает position: sticky; top: 0?',
+ o:['Элемент всегда фиксирован','Элемент прокручивается вместе со страницей, пока не дойдёт до верха, и там прилипает в пределах родителя','Элемент скрывается','То же, что absolute'],a:1,
+ e:'sticky не работает, если у предка overflow: hidden или auto.',
+ w:['Всегда фиксирован элемент с position: fixed.',null,'sticky ничего не скрывает.','absolute вынимает элемент из потока, а sticky остаётся в нём.']},
+{id:'c17',t:'css',k:'theory',q:'Как объявить и использовать CSS-переменную?',
+ o:['$color: red','--accent: #2d47c4 в :root и color: var(--accent)','@accent: red','var accent = red'],a:1,
+ e:'Переменные удобно переопределять для тёмной темы и компонентов без переписывания стилей.',
+ w:['Это синтаксис Sass, а не CSS.',null,'Это синтаксис Less.','Это JavaScript.']},
+{id:'c18',t:'css',k:'theory',q:'Для чего нужен псевдоэлемент ::before?',
+ o:['Выбирает первый элемент','Создаёт декоративный элемент перед содержимым, обязательно с content','Задаёт стиль до наведения','Скрывает элемент'],a:1,
+ e:'Без свойства content псевдоэлемент не отобразится. Для чисто декоративного элемента пишут content: "".',
+ w:['Первый элемент выбирает :first-child.',null,'Состояние до наведения — обычный стиль без :hover.','Скрывает display или visibility.']},
+{id:'c19',t:'css',k:'theory',q:'Что выберет селектор li:nth-child(2n)?',
+ o:['Каждый второй элемент li (чётные)','Только второй li','Первые два li','Все li'],a:0,
+ e:'2n+1 или odd — нечётные, 2n или even — чётные.',
+ w:[null,'Только второй выберет :nth-child(2).','Первые два выберет :nth-child(-n+2).','Все li выбирает селектор li.']},
+{id:'c20',t:'css',k:'theory',q:'Что делает flex: 1 у flex-элемента?',
+ o:['Ширина 1px','Элемент растягивается и делит свободное место с другими flex: 1 поровну','Элемент становится первым','Высота 1em'],a:1,
+ e:'Это сокращение для flex-grow: 1; flex-shrink: 1; flex-basis: 0%.',
+ w:['Единицы измерения тут нет, 1 — коэффициент роста.',null,'Порядок задаёт свойство order.','К высоте свойство отношения не имеет.']},
+{id:'c21',t:'css',k:'theory',q:'Как задать блоку пропорции 16:9 без хаков с padding?',
+ o:['height: 56%','aspect-ratio: 16 / 9','ratio: 16-9','proportion: 16:9'],a:1,
+ e:'aspect-ratio поддерживается современными браузерами и удобен для видео и карточек.',
+ w:['Процентная высота считается от родителя, а не от ширины.',null,'Такого свойства нет.','Такого свойства нет.']},
+{id:'c22',t:'css',k:'theory',q:'Что такое методология БЭМ?',
+ o:['Фреймворк','Соглашение об именах классов: блок__элемент--модификатор','Препроцессор','Библиотека анимаций'],a:1,
+ e:'Пример: .card, .card__title, .card--featured. Это помогает избегать конфликтов стилей.',
+ w:['БЭМ не подключается как библиотека.',null,'Препроцессоры — это Sass и Less.','К анимациям БЭМ не относится.']},
+{id:'c23',t:'css',k:'case',q:'Кнопка должна плавно менять цвет при наведении. Что написать?',
+ o:['animation: color','transition: background-color .2s ease у кнопки и новый цвет в :hover','@keyframes hover','transform: color'],a:1,
+ e:'transition ставят на обычное состояние, тогда анимация работает и при наведении, и при уходе курсора.',
+ w:['animation требует @keyframes и запускается без наведения.',null,'Ключевые кадры без animation не сработают.','transform отвечает за сдвиг, поворот и масштаб, а не за цвет.']},
+{id:'c24',t:'css',k:'theory',q:'Чем gap удобнее margin между элементами во flex и grid?',
+ o:['Ничем','gap задаёт расстояние только между элементами, без лишнего отступа по краям и без схлопывания','gap работает только в grid','gap быстрее загружается'],a:1,
+ e:'gap работает и во flex, и в grid во всех современных браузерах.',
+ w:['Разница есть: нет лишних отступов у крайних элементов.',null,'Во flex gap тоже работает.','На скорость загрузки свойство не влияет.']},
+
+// ---------- HTML и SEO ----------
+{id:'h11',t:'html',k:'theory',q:'Для чего нужен тег meta name="description"?',
+ o:['Для заголовка вкладки','Краткое описание страницы, которое поисковики часто показывают в выдаче','Для ключевых слов, по которым ранжируют','Для языка страницы'],a:1,
+ e:'Хорошее описание — 120–160 символов, своё для каждой страницы.',
+ w:['Заголовок вкладки задаёт тег title.',null,'meta keywords поисковики давно игнорируют.','Язык задаёт атрибут lang.']},
+{id:'h12',t:'html',k:'theory',q:'Зачем нужны теги Open Graph (og:title, og:image)?',
+ o:['Для скорости','Чтобы ссылка на сайт красиво выглядела в мессенджерах и соцсетях: заголовок, описание, картинка','Для защиты','Для мобильной версии'],a:1,
+ e:'Заказчик отправляет ссылку в Telegram и видит карточку с картинкой. Это важная мелочь для бизнеса.',
+ w:['На скорость теги не влияют.',null,'К безопасности они не относятся.','Мобильную версию делает адаптивная вёрстка.']},
+{id:'h13',t:'html',k:'theory',q:'Для чего файл sitemap.xml?',
+ o:['Для дизайна','Список страниц сайта для поисковиков, чтобы они быстрее находили и индексировали страницы','Для карты в контактах','Для меню'],a:1,
+ e:'В WordPress его создают SEO-плагины или сам WordPress (/wp-sitemap.xml), а затем добавляют в Яндекс.Вебмастер.',
+ w:['К дизайну sitemap не относится.',null,'Карту в контактах встраивают отдельным блоком.','Меню — часть разметки страниц.']},
+{id:'h14',t:'html',k:'theory',q:'Какая длина тега title считается хорошей для поисковой выдачи?',
+ o:['5–10 символов','Около 50–70 символов, с главным смыслом в начале','300 символов','Любая'],a:1,
+ e:'Длинный заголовок поисковик обрежет. Для каждой страницы title должен быть уникальным.',
+ w:['Слишком короткий заголовок мало что говорит.',null,'Такой заголовок обрежут в выдаче.','Длина важна: лишнее обрезается.']},
+{id:'h15',t:'html',k:'case',q:'На странице услуги стоит кнопка «Позвонить». Как сделать, чтобы на телефоне сразу открывался набор номера?',
+ o:['onclick="call()"','Ссылка href="tel:+79859948918"','href="phone:..."','Только текст номера'],a:1,
+ e:'Аналогично mailto: открывает почту, а ссылки на мессенджеры — их приложения.',
+ w:['Функции call в браузере нет.',null,'Схемы phone: не существует.','Номер текстом придётся копировать вручную.']},
+
+// ---------- Скорость ----------
+{id:'p9',t:'perf',k:'theory',q:'Что означает font-display: swap у веб-шрифта?',
+ o:['Шрифт не загружается','Пока шрифт грузится, текст показывается системным шрифтом, потом заменяется','Шрифт грузится последним','Шрифт кэшируется навсегда'],a:1,
+ e:'Так текст не остаётся невидимым во время загрузки. В Google Fonts это параметр display=swap.',
+ w:['Шрифт загружается, просто текст виден раньше.',null,'Порядок загрузки swap не задаёт.','Кэширование настраивается отдельно.']},
+{id:'p10',t:'perf',k:'case',q:'В PageSpeed предупреждение «Устраните ресурсы, блокирующие отображение». Что поможет?',
+ o:['Добавить ещё один CSS-файл','Добавить defer скриптам, объединить и уменьшить CSS, загружать неважное позже','Увеличить картинки','Отключить кэш'],a:1,
+ e:'Критические стили для первого экрана можно встроить в страницу, остальные подгрузить позже.',
+ w:['Ещё один файл добавит блокирующий запрос.',null,'Картинки не блокируют отрисовку так, как CSS и JS в head.','Без кэша станет только медленнее.']},
+{id:'p11',t:'perf',k:'theory',q:'Что такое минификация CSS и JS?',
+ o:['Удаление функций','Удаление пробелов, переносов и комментариев, чтобы файл весил меньше','Сжатие картинок','Объединение сайтов'],a:1,
+ e:'В WordPress это делают плагины оптимизации, в сборке проекта — Vite или webpack.',
+ w:['Логика кода сохраняется.',null,'Картинки сжимают отдельно.','К сайтам целиком минификация не относится.']},
+
+// ---------- Figma ----------
+{id:'f1',t:'html',k:'theory',q:'Где в Figma посмотреть размеры, отступы и CSS элемента для вёрстки?',
+ o:['В меню «Файл»','На вкладке Inspect или в Dev Mode справа','В плагинах обязательно','Нигде'],a:1,
+ e:'Там видны размеры, шрифты, цвета и расстояния между элементами. Расстояние показывается при наведении с Alt (Option).',
+ w:['В меню «Файл» только операции с документом.',null,'Плагины не обязательны, всё есть встроенное.','Figma показывает все параметры элементов.']},
+{id:'f2',t:'html',k:'theory',q:'Auto Layout в Figma при вёрстке ближе всего к…',
+ o:['position: absolute','display: flex с gap и padding','float','table'],a:1,
+ e:'Направление Auto Layout — flex-direction, spacing — gap, padding — padding. Это ускоряет перенос макета в код.',
+ w:['Auto Layout как раз раскладывает элементы потоком.',null,'float — устаревший способ раскладки.','Таблицы для раскладки не используют.']},
+{id:'f3',t:'html',k:'case',q:'Нужно выгрузить иконки из Figma для сайта. Какой формат обычно лучший?',
+ o:['JPG','SVG','BMP','GIF'],a:1,
+ e:'SVG чёткий на любом экране и мало весит. Фотографии выгружают в WebP или JPG.',
+ w:['JPG не поддерживает прозрачность и размывает чёткие края иконок.',null,'BMP огромный и не подходит для веба.','GIF устарел для иконок.']},
+
+// ---------- Git ----------
+{id:'g9',t:'git',k:'theory',q:'Как посмотреть, что именно изменилось в файлах перед коммитом?',
+ o:['git log','git diff','git push','git init'],a:1,
+ e:'git diff показывает изменения, ещё не добавленные в индекс. git diff --staged — уже добавленные.',
+ w:['git log показывает историю коммитов.',null,'push отправляет коммиты.','init создаёт репозиторий.']},
+{id:'g10',t:'git',k:'theory',q:'Как написать хорошее сообщение коммита?',
+ o:['«fix»','Коротко, что сделано: «Добавил отправку формы через fetch»','«изменения»','Пустое'],a:1,
+ e:'Хорошая история коммитов — часть портфолио: по ней видно, как ты работаешь.',
+ w:['По слову «fix» непонятно, что исправлено.',null,'«Изменения» ничего не говорит.','Git не даст сделать коммит без сообщения.']},
+{id:'g11',t:'git',k:'case',q:'Нужно выложить сайт-портфолио бесплатно прямо из репозитория. Что использовать?',
+ o:['GitHub Pages','git stash','git tag','.gitignore'],a:0,
+ e:'В настройках репозитория выбирают ветку, и сайт доступен по адресу username.github.io/репозиторий.',
+ w:[null,'stash временно убирает незакоммиченные изменения.','tag помечает версию.','.gitignore перечисляет файлы, которые Git не отслеживает.']},
+
+// ---------- React ----------
+{id:'r11',t:'react',k:'theory',q:'Что такое компонент в React?',
+ o:['CSS-класс','Функция, которая принимает props и возвращает JSX','HTML-файл','База данных'],a:1,
+ e:'Компоненты называют с большой буквы: function Card({ title }) { return <h3>{title}</h3>; }',
+ w:['Компонент — это код, а не класс стилей.',null,'Разметку описывает JSX внутри функции.','К базам данных компоненты не относятся.']},
+{id:'r12',t:'react',k:'theory',q:'Как передать данные от дочернего компонента родителю?',
+ o:['Через props напрямую','Родитель передаёт функцию через props, ребёнок вызывает её с данными','Через CSS','Никак'],a:1,
+ e:'Пример: <Form onSubmit={handleSubmit} />, внутри Form вызывается onSubmit(data).',
+ w:['props идут только сверху вниз.',null,'CSS не передаёт данные.','Способ есть — колбэк через props.']},
+
+// ---------- Собеседование ----------
+{id:'hr12',t:'hr',k:'hr',q:'«Расскажите о проекте, которым гордитесь». Какой ответ сильнее?',
+ o:['«Ну, делал разные сайты»','«Сайт строительной компании на WordPress: собрал за 1–2 дня, PageSpeed почти максимальный, заказчик назвал его рабочим инструментом»','«Учебный сайт Nike»','«Не помню»'],a:1,
+ e:'Конкретика: задача, что сделал, срок, измеримый результат, отзыв.',
+ w:['Размытый ответ ничего не говорит о навыках.',null,'Коммерческий проект с результатом сильнее учебного.','Такой ответ говорит о слабой подготовке.']},
+{id:'hr13',t:'hr',k:'hr',q:'«Как вы оцениваете сроки задачи?»',
+ o:['«Как получится»','Разбиваю задачу на части, оцениваю каждую, добавляю запас и предупреждаю заранее, если срок сдвигается','«Всегда за день»','«Сроки ставит руководитель»'],a:1,
+ e:'Работодателю важно, чтобы о риске срыва срока он узнал заранее, а не в день сдачи.',
+ w:['Это звучит как отсутствие планирования.',null,'Обещание «всегда за день» нереалистично.','Ответ без участия звучит пассивно.']},
+{id:'hr14',t:'hr',k:'hr',q:'«Как вы реагируете на замечания по коду?»',
+ o:['«Спорю, если не согласен»','«Разбираюсь, задаю вопросы, если неясно, и исправляю. Ревью — способ быстрее расти»','«Обижаюсь»','«У меня не бывает замечаний»'],a:1,
+ e:'Для junior умение принимать ревью важнее идеального кода.',
+ w:['Спор без попытки понять создаёт конфликт.',null,'Обида мешает работе в команде.','Это звучит самоуверенно и неправдоподобно.']},
+{id:'hr15',t:'hr',k:'hr',q:'«Был ли у вас случай, когда что-то сломалось на сайте клиента?»',
+ o:['«Нет, никогда»','Рассказать реальный случай: например, заражение сайта вредоносным кодом, что делал по шагам и чем закончилось','«Да, но это не моя вина»','«Не помню»'],a:1,
+ e:'Хороший ответ показывает, что ты не паникуешь, действуешь по плану и делаешь выводы.',
+ w:['Ответ «никогда» неправдоподобен.',null,'Перекладывание вины настораживает.','Лучше подготовить историю заранее.']},
+{id:'hr16',t:'hr',k:'hr',q:'«Почему вы хотите именно удалённую работу?»',
+ o:['«Не люблю людей»','«Удалённо я уже работаю с клиентами: сам планирую день, на связи и сдаю в срок. И так остаётся время на учёбу»','«Можно не работать»','«Не хочу ездить»'],a:1,
+ e:'Покажи, что удалёнка для тебя — рабочий формат, в котором ты уже умеешь быть надёжным.',
+ w:['Такой ответ пугает: в команде придётся общаться.',null,'Это сразу закроет разговор.','Выгода только для себя, без пользы для работодателя.']},
+{id:'hr17',t:'hr',k:'hr',q:'«Как у вас с английским?»',
+ o:['«Никак»','«B1–B2: читаю документацию и переписываюсь. Учу каждый день, 1600+ дней подряд в Duolingo»','«Свободно» (если это неправда)','«А зачем он?»'],a:1,
+ e:'Честный уровень плюс доказательство регулярности. Для зарубежных компаний могут проверить разговорный английский.',
+ w:['Это закроет путь в компании, где английский нужен.',null,'Преувеличение вскроется на первом же звонке.','Документация и библиотеки в основном на английском.']},
+{id:'hr18',t:'hr',k:'hr',q:'Тестовое задание кажется слишком большим. Как поступить?',
+ o:['Молча не делать','Уточнить у компании объём и срок, сделать основное качественно и честно описать, что не успел и как бы доделал','Сделать наполовину и не говорить','Попросить ИИ сделать всё целиком без проверки'],a:1,
+ e:'Аккуратная часть с понятным README ценится выше сырого «всего».',
+ w:['Пропущенный шанс без объяснения.',null,'Недоделка без пояснения выглядит как небрежность.','На собеседовании попросят объяснить код, и это вскроется.']},
+];
+
+
+// Почему неправильный вариант неверен. Порядок совпадает с o[] в data.js, у правильного ответа null.
+const WHY = {
+js1:['typeof всегда возвращает строку с типом, но для null это не "null", а историческое "object".',null,'"undefined" возвращается для необъявленных или неинициализированных значений, null — другое значение.','typeof никогда не бросает ошибку, даже для null.'],
+js2:['Из-за двоичного представления 0.1 + 0.2 равно 0.30000000000000004, а не ровно 0.3.',null,'NaN получается при некорректных вычислениях, здесь обычное сравнение двух чисел.','Сравнение чисел не может вызвать ошибку.'],
+js3:['2 вышло бы, если бы "2" превратилась в число до сложения. Но + со строкой склеивает.','"111" — это результат склейки, но минус после неё работает уже с числами и возвращает число.',null,'NaN был бы, если бы строка не превращалась в число. "12" превращается в 12 без проблем.'],
+js4:['3 было бы, если бы b была копией. Но b — ссылка на тот же массив.',null,'length у массива всегда число.','const запрещает только b = [...], а изменять содержимое массива можно.'],
+js5:['Присваивание x = 5 выполняется на второй строке, а вывод уже на первой.',null,'ReferenceError бывает у let и const. Объявление var поднимается, и ошибки нет.','null никто не присваивал, необъявленное значение var — это undefined.'],
+js6:['До строки let y = 5 значение ещё не присвоено.','undefined было бы у var. У let до объявления — временная мёртвая зона.',null,'null — отдельное значение, его здесь нет.'],
+js7:[null,'copy — новый объект, поэтому изменение copy.name не затрагивает user.','У user поле name есть, оно просто не изменилось.','Изменение поля объекта — обычная операция, ошибки нет.'],
+js8:['Спред копирует только верхний уровень. item в обоих объектах — один и тот же вложенный объект.',null,'Поле qty существует, его изменили через общую ссылку.','Изменение вложенного поля не вызывает ошибку.'],
+js9:['Строгое === сравнивает и тип, а у null и undefined типы разные.','Нестрогое == считает null и undefined равными, это специальное правило языка.',null,'Наоборот: нестрогое равенство даёт true, строгое — false.'],
+js10:['NaN — единственное значение в JS, которое не равно самому себе.',null,'Сравнение всегда возвращает true или false, а не NaN.','Сравнение NaN — обычная операция без ошибки.'],
+js11:['Так было бы с функцией сравнения (a, b) => a - b. Без неё элементы сравниваются как строки.','sort по умолчанию сортирует по возрастанию, а не по убыванию.',null,'sort меняет исходный массив на месте.'],
+js12:['includes сравнивает строго, как ===. Строка "2" не равна числу 2.',null,'includes возвращает true или false, а не индекс. Индекс вернул бы indexOf.','includes принимает значение любого типа, ошибки нет.'],
+js13:['Строки в JS неизменяемы, присваивание по индексу ничего не меняет.',null,'Присваивание по индексу строки молча игнорируется, ошибки нет (вне строгого режима).','s по-прежнему содержит "hello".'],
+js14:['Number("12px") не умеет игнорировать лишние символы и возвращает NaN.',null,'parseInt читает цифры с начала строки и останавливается на "p", поэтому вернёт 12.','Наоборот: NaN вернёт Number, а parseInt вернёт 12.'],
+js15:[null,'x = 2 живёт только внутри фигурных скобок, снаружи видна внешняя x.','Внешняя x объявлена и равна 1.','Объявить let x во вложенном блоке можно, это другая переменная.'],
+js16:[null,'Строки получились бы, если бы элементы были строками. Здесь числа, и они складываются.','reduce возвращает одно накопленное значение, а не массив.','0 — только начальное значение, дальше к нему прибавляются элементы.'],
+js17:['Если tax не передан, он вычисляется как 100 * 0.2 = 20 и прибавляется.',null,'NaN был бы при undefined, но параметр по умолчанию подставил число.','Функция возвращает base + tax, значит результат есть.'],
+js18:[null,'?. возвращает undefined, а не null.','Ошибка была бы без ?.: user.address.city. Опциональная цепочка её предотвращает.','Пустую строку никто не возвращает, поля просто нет.'],
+js19:['?? не заменяет 0, потому что 0 не null и не undefined.','|| заменяет 0, потому что 0 — ложное значение.',null,'Наоборот: || даёт 5, а ?? оставляет 0.'],
+js20:['Лишняя запятая пропускает второй элемент, поэтому third получает 30.',null,'first берёт первый элемент, то есть 10.','Третий элемент существует и равен 30.'],
+js21:['Первый вызов inc() уже увеличил count до 1.','1 вернул первый вызов. Второй вызов увеличивает ту же count до 2.',null,'Стрелочная функция возвращает ++count, то есть число.'],
+js22:['Пустая строка — ложь, но "0" и [] — истина.',null,'Пустая строка ложная, а пустой массив истинный. Здесь перепутано.','Пустой массив — объект, а все объекты истинны.'],
+js23:[null,'filter оставляет нечётные (n % 2 = 1), а не чётные.','filter отбрасывает чётные 2 и 4 до умножения.','map умножает оставшиеся числа на 10, поэтому 1 и 3 не дошли бы до вывода как есть.'],
+js24:['Для массива typeof возвращает "object", значения "array" у typeof нет.',null,'instanceof Object истинно и для обычных объектов, и для дат, это не проверка на массив.','У строки тоже есть length, а пустой массив не прошёл бы проверку.'],
+js25:[null,'Разницы в скорости нет, выбор зависит от того, будет ли переменная переприсваиваться.','Обе переменные блочные, во всей функции видна var.','Это не синонимы: const нельзя переприсвоить.'],
+js26:['|| заменит и 0, а 0 здесь допустимое значение.',null,'&& вернёт 10 только если limit истинный, это обратная логика.','Тернарный оператор проверяет истинность, поэтому 0 тоже заменится на 10.'],
+js27:[null,'Object.keys всегда возвращает массив, у него есть length.','Ключей два: a и b.','Object.keys работает с любым объектом.'],
+js28:['Строку развернули, поэтому порядок букв обратный.',null,'join("") склеивает массив обратно в строку.','Спред строки — допустимая операция.'],
+as1:['setTimeout и then асинхронные, они не выполняются по порядку строк.','Колбэк промиса (микрозадача) выполняется раньше таймера (макрозадачи).',null,'4 — синхронный код, он выполняется раньше колбэка промиса.'],
+as2:['После await код продолжается асинхронно, и c успевает вывестись раньше b.',null,'Код функции до первого await выполняется сразу, поэтому a печатается первой.','b печатается только после await.'],
+as3:['Так было бы с let. С var переменная одна на весь цикл.',null,'Цикл заканчивается, когда i становится 3, а не 2.','i существует и равна 3 к моменту срабатывания таймеров.'],
+as4:[null,'3 3 3 было бы с var. let создаёт новую переменную на каждой итерации.','Последняя итерация выполняется при i = 2, но каждый таймер помнит своё значение.','Каждая итерация получает свою копию i.'],
+as5:['then выполняется асинхронно, после синхронного console.log(3).','Функция внутри new Promise выполняется сразу, поэтому 1 печатается первой.',null,'2 не может быть первой: then срабатывает после всего синхронного кода.'],
+as6:['catch возвращает новый промис, поэтому следующий then тоже выполнится.','catch выполнится первым и выведет сообщение ошибки.',null,'Ошибку обработал catch, она не осталась необработанной.'],
+as7:[null,'async-функция всегда возвращает Promise, даже при return 5.','Значение 5 лежит внутри промиса, напрямую его не получить.','Функция что-то возвращает: промис.'],
+as8:[null,'catch работает с fetch, но срабатывает только при отклонённом промисе.','Порядок then и catch тут ни при чём.','404 — ошибка для приложения, но fetch считает её нормальным ответом сервера.'],
+as9:['Первый выполненный промис ждёт Promise.race или Promise.any.',null,'Не отклоняется никогда Promise.allSettled.','Промисы выполняются параллельно, all только ждёт их.'],
+as10:['then не выполнится при ошибке, и надпись останется.','catch не выполнится при успехе, и надпись останется.',null,'Сразу после вызова fetch ответа ещё нет, надпись исчезнет раньше времени.'],
+dom1:[null,'Перезагрузка удалит динамически добавленные элементы и не решит задачу.','onclick в HTML смешивает разметку и логику и неудобен для динамических элементов.','Повторная подписка по таймеру создаёт дубли обработчиков и утечки.'],
+dom2:['stopPropagation не отменяет отправку формы, он только останавливает всплытие.',null,'Без тега form теряются отправка по Enter и встроенная валидация.','action задаёт адрес отправки, а не отменяет её.'],
+dom3:['Это разные методы с разными задачами.',null,'Наоборот: всплытие останавливает stopPropagation.','Переход по ссылке отменяет preventDefault.'],
+dom4:['Пустую коллекцию возвращает querySelectorAll, а не querySelector.','querySelector возвращает null, а не undefined.',null,'Отсутствие элемента не считается ошибкой.'],
+dom5:['innerHTML выполнит разметку из строки, а пользователь может вставить вредоносный код.',null,'document.write устарел и перезаписывает страницу после загрузки.','outerHTML заменяет сам элемент разметкой из строки — тот же риск, что у innerHTML.'],
+dom6:['Это разные режимы загрузки скриптов.',null,'async не ждёт картинки, он выполняет скрипт сразу после загрузки.','defer работает только для внешних скриптов с src.'],
+dom7:['dataset.userId существует, data-user-id превращается в userId.',null,'Значения data-атрибутов всегда строки, числом они не становятся.','Обращение к dataset безопасно.'],
+dom8:[null,'localStorage не очищается при перезагрузке, он хранит данные постоянно.','sessionStorage тоже хранит только строки, проблема останется.','Размер не виноват: «[object Object]» — результат приведения объекта к строке.'],
+dom9:['Всегда добавляет classList.add.',null,'Наличие класса проверяет classList.contains.','Все классы заменяет присваивание className.'],
+dom10:['load ждёт картинки, шрифты и стили, поэтому наступает позже.',null,'Между событиями обычно проходит заметное время.','Порядок событий описан стандартом и одинаков во всех браузерах.'],
+h1:['Подпись делают тегом figcaption, alt на странице не виден.',null,'alt не влияет на скорость загрузки.','Подсказку при наведении показывает title.'],
+h2:['Стили одинаковые, но клавиатура и скринридеры обрабатывают теги по-разному.',null,'В формах для отправки используют button, а не a.','button можно и нужно использовать вне форм для любых действий.'],
+h3:['Связка влияет на удобство и доступность, а не только на вид.',null,'Форма отправится и без label.','Связка нужна всем полям, не только чекбоксам.'],
+h4:['Тег не подключает стили, он настраивает область просмотра.',null,'Зум запрещают user-scalable=no, и делать так не рекомендуется.','На скорость загрузки тег не влияет.'],
+h5:['type="number" убирает плюс и ведущие нули и добавляет стрелки, для телефона не подходит.',null,'pattern проверяет значение, но не меняет клавиатуру.','inputmode="text" как раз открывает буквенную клавиатуру.'],
+h6:[null,'lazy не сжимает файл, а откладывает его загрузку.','Качество картинки не меняется.','Атрибут современный и поддерживается браузерами.'],
+h7:['div не сообщает браузеру и скринридеру, что это навигация.',null,'Тег menu предназначен для списков команд, а не для навигации по сайту.','header — шапка, навигация внутри неё оформляется тегом nav.'],
+h8:['Несколько h1 запутывают структуру страницы для скринридеров и поисковиков.',null,'Без h1 у страницы нет главного заголовка.','Секциям подходят h2 и ниже.'],
+h9:['Подпись делают через figcaption или alt.',null,'srcset не анимирует картинку.','Ленивую загрузку включает loading="lazy".'],
+h10:['На оформление required не влияет.',null,'Звёздочку добавляют стилями или текстом в label.','Значение поля required не сохраняет.'],
+c1:['Синий был бы, если бы специфичность была равной и .heading шёл ниже.',null,'Порядок важен только при одинаковой специфичности, а id специфичнее класса.','Цвета не смешиваются, побеждает одно правило.'],
+c2:[null,'240px получилось бы при box-sizing: content-box.','Отступ считается с двух сторон, и при border-box он входит в ширину.','Ширина содержимого будет 160px, а сам блок — 200px.'],
+c3:['margin: auto центрирует по горизонтали, но не по вертикали в обычном потоке.',null,'text-align центрирует только строчный контент.','Значения position: center не существует.'],
+c4:['Относительно окна позиционирует position: fixed.',null,'Только если у родителя position не static.','Относительно body — только если выше нет позиционированных предков.'],
+c5:['Единицы считаются от разных размеров шрифта.',null,'Наоборот: от html считается rem.','rem подходит и для шрифтов, и для отступов.'],
+c6:['Число не поможет, если элемент в другом контексте наложения.',null,'!important не обходит контекст наложения.','Порядок правил не влияет на контекст наложения.'],
+c7:['Строки задаёт grid-template-rows.',null,'1fr — доля свободного места, а не пиксель.','repeat повторяет описание колонки, а не элемент.'],
+c8:['overflow-x: hidden прячет проблему и может сломать position: sticky.',null,'Медиазапросы не виноваты, виноват конкретный широкий элемент.','Уменьшение шрифта не исправит элемент фиксированной ширины.'],
+c9:['Разница есть: занимает ли элемент место.',null,'Место сохраняет visibility: hidden.','display не анимируется плавно.'],
+c10:['width и height вызывают пересчёт раскладки на каждом кадре.','top и left тоже пересчитывают раскладку.',null,'margin пересчитывает раскладку и дёргает соседние элементы.'],
+c11:['clamp не фиксирует размер, он ограничивает его диапазоном.',null,'clamp не обрезает текст.','clamp работает на любом экране.'],
+c12:['Растягивание с искажением — это object-fit: fill.',null,'Вписывание целиком с полями — это contain.','Фоном картинку делают через background-image.'],
+c13:[null,'Это desktop-first: от большого экрана к маленькому.','Mobile-first — порядок написания стилей, а не отказ от десктопа.','vw тут ни при чём, речь о порядке медиазапросов.'],
+c14:[null,'display: block убирает flex-раскладку целиком.','float — устаревший способ раскладки, проблему он не решит.','100vw только увеличит ширину и добавит горизонтальный скролл.'],
+c15:['Это поведение описано в стандарте CSS.',null,'box-sizing влияет на размеры блока, а не на схлопывание отступов.','Внутри flex отступы как раз не схлопываются.'],
+w1:['Ошибка сервера — коды 5xx.',null,'Нет доступа — 403 (или 401 без авторизации).','Перенаправления — коды 3xx.'],
+w2:['Форматы картинок — WebP, AVIF, PNG.',null,'Шифрование обеспечивает TLS (HTTPS).','CORS не связан с базами данных.'],
+w3:['Если файл сохранён на сервере, проблема обычно в кэше.',null,'Статичные файлы перезапуск сервера не требуют.','Сломанный CSS не объясняет, почему у тебя всё работает.'],
+w4:['Возвращать HTTP небезопасно, браузеры помечают такие сайты.',null,'Без SSL сайт станет небезопасным, а ссылки так и останутся http.','Кэш не меняет адреса ресурсов в базе.'],
+w5:['Методы различаются смыслом и способом передачи данных.',null,'Скорость от метода не зависит.','Наоборот: в GET параметры видны в адресе, поэтому пароли так не передают.'],
+w6:['localStorage доступен любому скрипту на странице, в том числе внедрённому.',null,'Переменная window доступна всем скриптам и пропадает при перезагрузке.','sessionStorage тоже читается из JavaScript.'],
+w7:['Сначала нужна диагностика, переписывать вслепую бессмысленно.',null,'Хостер понадобится, только если DevTools покажет ошибку сервера.','Смена браузера не покажет причину.'],
+w8:['Хостинг — место, где лежат файлы сайта.',null,'Сертификат — это SSL/TLS.','Почтой занимаются почтовые серверы и MX-записи.'],
+w9:['Сдвиги вёрстки показывает CLS.',null,'Время ответа сервера — TTFB.','Отклик на действия показывает INP.'],
+w10:['Ключ без кавычек и одинарные кавычки — невалидный JSON.',null,'JSON.parse не вернёт строку, он либо создаёт значение, либо падает.','При невалидном JSON будет исключение, а не undefined.'],
+g1:['push отправляет коммиты, а их ещё нет.',null,'commit фиксирует только добавленные через add файлы.','pull получает изменения, но не сохраняет твои правки.'],
+g2:['Отправляет коммиты git push.',null,'Ветки удаляют через git branch -d.','Копию создаёт git clone.'],
+g3:['git branch new создаёт ветку, но не переключается на неё.',null,'merge сливает ветки.','push отправляет ветку на сервер.'],
+g4:[null,'--hard удалит и коммит, и изменения в файлах.','Удаление .git уничтожит всю историю проекта.','--force переписывает историю на сервере, а коммит ещё даже не отправлен.'],
+g5:['Переписывание общей истории ломает работу коллег.',null,'Удалять репозиторий из-за одного коммита незачем.','Это не решение, ошибочный коммит останется в ветке.'],
+g6:['Наоборот: секреты в репозиторий не кладут.',null,'.gitignore не отключает Git.','Проект описывает README.'],
+g7:['Пересоздание репозитория не решит конфликт и может потерять работу.',null,'--force перезапишет чужие изменения на сервере.','Пока конфликт не решён, коммит не сделать.'],
+g8:['Историю показывает git log.',null,'Ветки на сервере показывает git branch -r.','Автора видно в git log.'],
+wp1:['Жёсткий тег в header.php ломает зависимости и версии, плагины могут подключить файлы повторно.',null,'@import замедляет загрузку: файлы грузятся последовательно.','Дублирование в шаблонах приводит к ошибкам и лишнему коду.'],
+wp2:['index.php — последний запасной шаблон, если нет более точных.',null,'page.php используется для обычных страниц, а не для главной, если есть front-page.php.','WordPress не использует home.html в PHP-темах.'],
+wp3:['Разница есть: возвращает значение или выводит его.',null,'Обе функции работают и вне цикла, если передать ID записи.','get_field — основная функция ACF.'],
+wp4:['Мобильная версия делается адаптивной вёрсткой.',null,'Дочерняя тема не ускоряет сайт.','Мультиязычность делают плагины.'],
+wp5:['Переустановка не исправит ошибку в теме и может потерять данные.',null,'База данных тут ни при чём, ошибка в PHP-файле.','Ошибка в коде сама не исправится.'],
+wp6:['echo без экранирования выведет HTML и скрипты из поля.',null,'print_r — для отладки массивов, не для вывода на страницу.','strip_tags удаляет теги, но не экранирует спецсимволы в атрибутах.'],
+wp7:['Простая замена ломает сериализованные данные.',null,'SQL умеет заменять, проблема в формате хранения.','База не удалится, но настройки виджетов и плагинов могут сломаться.'],
+wp8:['Переустановка плагина не меняет способ отправки писем.',null,'Тема не отвечает за отправку почты.','Кэш не влияет на отправку писем.'],
+wp9:['Без параметров get_posts вернёт обычные записи, а не project.',null,'query_posts ломает основной запрос и не рекомендуется.','Прямой SQL обходит API WordPress, кэш и фильтры.'],
+wp10:['Подстановка переменных работает только в двойных кавычках.',null,'Ошибки нет, строка просто выводится как есть.','Текст после запятой не пропадает, $name выводится буквально.'],
+p1:['Удалять контент — не решение.',null,'Серверы не уменьшат вес картинок.','Прелоадер не ускоряет загрузку, а прячет её.'],
+p2:['2:1 слишком мало, текст плохо читается.','3:1 допустим только для крупного текста.',null,'10:1 избыточно, норма для обычного текста — 4.5:1.'],
+p3:['title показывается не всем и плохо зачитывается скринридерами.',null,'Размер иконки не даёт ей текстового имени.','Есть стандартный способ: aria-label.'],
+p4:['Удалять картинки — не решение.',null,'Прелоадер прячет загрузку, но не резервирует место.','absolute вырывает элемент из потока и ломает раскладку.'],
+p5:['Батарея не главная причина, медиазапрос нужен людям с чувствительностью к движению.',null,'На SEO настройка не влияет.','Настройка есть во всех системах: Windows, macOS, Android, iOS.'],
+p6:['Без видимого фокуса человек с клавиатурой не видит, где находится.',null,'Прозрачная обводка — то же самое, что её отсутствие.','Отключение фокуса ломает навигацию с клавиатуры.'],
+p7:['Ошибка в скрипте не делает его блокирующим.',null,'Аналитика блокирует, только если подключена без async или defer.','Скрипт внизу страницы как раз почти не блокирует отрисовку.'],
+p8:['Атрибут не переводит страницу, он сообщает её язык.',null,'Ключевые слова для SEO — отдельная тема, lang их не задаёт.','Он нужен скринридерам и браузеру.'],
+r1:['Оба вызова используют одно и то же старое значение count = 0.',null,'Состояние изменится, просто не на 2.','Двойной вызов setState допустим.'],
+r2:['Стили через key не задаются.',null,'Порядок сортировки key не меняет.','Без key React выдаст предупреждение и может перепутать элементы.'],
+r3:['При каждом рендере эффект срабатывает без массива зависимостей.',null,'Эффект с [] срабатывает один раз.','useEffect выполняется после рендера, а не до него.'],
+r4:['Разница принципиальная: кто владеет данными.',null,'Наоборот: детям передают props.','props могут быть любого типа: числа, объекты, функции.'],
+r5:['React не рисует false, null и undefined, но рисует 0.',null,'До List дело не дойдёт: выражение вернёт 0.','Ошибки нет, просто на экране будет 0.'],
+r6:['push работает, но меняет тот же массив.',null,'Перезагрузка потеряет состояние.','useEffect не заставит React увидеть изменение той же ссылки.'],
+r7:['class — зарезервированное слово в JS, React ждёт className.',null,'Атрибута cssClass в React нет.','Атрибута styleClass в React нет.'],
+r8:['Валидация — отдельная тема.',null,'Поле можно редактировать, просто значение хранится в state.','Контролируемым может быть поле и вне формы.'],
+r9:['Без очистки обработчики накапливаются.',null,'Повторный вызов эффекта добавит ещё один обработчик.','key не связан с подписками.'],
+r10:['Состояние хранят useState и useReducer.',null,'Запросы делают в useEffect или через библиотеки.','useMemo не связан с анимациями.'],
+hr1:['Критика бывшего работодателя настораживает: так же будете говорить и о новом.',null,'Ответ без причины звучит как отсутствие мотивации.','Отказ отвечать вызывает подозрения.'],
+hr2:['Детство и школа неинтересны работодателю и съедают время.',null,'Хобби уместны в конце и коротко.','С зарплаты разговор не начинают.'],
+hr3:['«Перфекционист» — заезженная заготовка, её не воспринимают всерьёз.','Ответ «слабых сторон нет» звучит как отсутствие самокритики.',null,'Такая слабость дисквалифицирует, а не показывает рост.'],
+hr4:['Неправда вскроется на тестовом или в разговоре.',null,'Так вы признаёте, что не понимаете свой код.','Не знать про ИИ в 2026 году для разработчика — минус.'],
+hr5:['Без цифры вас легко оценят дешевле.',null,'Завышенная сумма без обоснования закроет разговор.','Вопрос всё равно вернётся, лучше подготовиться.'],
+hr6:['Выдумку опытный интервьюер раскусит за минуту.',null,'Молчание не показывает, как вы думаете.','Уход от темы выглядит как попытка скрыть незнание.'],
+hr7:['Отчаяние отталкивает: компании ищут заинтересованных.',null,'Удалёнка — выгода для вас, а не причина выбрать именно эту компанию.','Это показывает, что вы не изучили компанию.'],
+hr8:['«Нет вопросов» звучит как отсутствие интереса.',null,'Об отпуске лучше спросить после оффера.','Такой вопрос выглядит как нежелание работать.'],
+hr9:['«Отдыхал» полгода звучит как потеря навыков.',null,'Размытый ответ вызывает больше вопросов, чем снимает.','Пустота в резюме — главное, что вызывает недоверие.'],
+hr10:['Жалобы на заказчика показывают неумение решать проблемы.',null,'Ответ «сложностей не было» звучит неправдоподобно.','Чужую историю легко разоблачить уточняющими вопросами.'],
+hr11:['Такой ответ пугает: работодатель решит, что работа будет второстепенной.',null,'Это показывает безответственность.','Работодателю нужна уверенность, что вы уже всё продумали.'],
+};
+
+
+QUESTIONS.push(...QUESTIONS2);
+</script>
+<script>
+const IS_PWA = true;
+const KINDS = {code:'Что выведет код', case:'Ситуация', theory:'Теория', hr:'Собеседование'};
+const DAILY = 10;
+const $view = document.getElementById('view');
+
+/* ---------- даты и случайность ---------- */
+const pad = n => String(n).padStart(2,'0');
+const dayKey = (d = new Date()) => d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate());
+const addDays = (key, n) => { const [y,m,d] = key.split('-').map(Number); return dayKey(new Date(y, m-1, d+n)); };
+const today = () => dayKey();
+const hash = s => { let h = 2166136261; for (const ch of s) { h ^= ch.codePointAt(0); h = Math.imul(h, 16777619); } return h >>> 0; };
+const rng = seed => () => { seed |= 0; seed = seed + 0x6D2B79F5 | 0; let t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; };
+const shuffle = (arr, rand) => { const a = arr.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rand() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+
+/* ---------- состояние и хранение ---------- */
+const LS_KEY = 'frontend-trener-v1';
+const blank = () => ({ v: 1, answers: {}, days: {}, mistakes: [], extra: [], xp: 0, best: 0 });
+const LEVEL_XP = 250;
+const level = xp => Math.floor((xp || 0) / LEVEL_XP) + 1;
+const FLAME = '<svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M12.6 2.2c.6 3.3 3.9 5.4 5.3 8.6 1.6 3.7-.5 9-5.9 9-4.6 0-6.9-3.6-6.2-7.4.4-2.2 1.9-3.6 2.8-4.6.1 1.9.8 3.2 2 3.7-.4-3.5.4-6.4 2-9.3z"/></svg>';
+let state = blank();
+try { const raw = localStorage.getItem(LS_KEY); if (raw) state = Object.assign(blank(), JSON.parse(raw)); } catch (e) {}
+
+const sync = { mode: 'local', ref: null, writing: false, pending: false, timer: null };
+function merge(a, b) {
+  const out = blank();
+  const ids = new Set([...Object.keys(a.answers || {}), ...Object.keys(b.answers || {})]);
+  for (const id of ids) {
+    const x = a.answers?.[id], y = b.answers?.[id];
+    if (!x || !y) { out.answers[id] = x || y; continue; }
+    const nx = x.c + x.w, ny = y.c + y.w;
+    out.answers[id] = nx !== ny ? (nx > ny ? x : y) : ((x.last || '') >= (y.last || '') ? x : y);
+  }
+  const days = new Set([...Object.keys(a.days || {}), ...Object.keys(b.days || {})]);
+  for (const d of days) {
+    const x = a.days?.[d], y = b.days?.[d];
+    if (!x || !y) { out.days[d] = x || y; continue; }
+    const dx = Object.keys(x.done || {}).length + (x.n || 0), dy = Object.keys(y.done || {}).length + (y.n || 0);
+    out.days[d] = dx >= dy ? x : y;
+  }
+  const mm = new Map();
+  for (const m of [...(a.mistakes || []), ...(b.mistakes || [])]) { const cur = mm.get(m.id); if (!cur || m.d >= cur.d) mm.set(m.id, m); }
+  out.mistakes = [...mm.values()].sort((p, q) => q.d < p.d ? -1 : 1).slice(0, 150);
+  const ex = new Map(); for (const q of [...(a.extra || []), ...(b.extra || [])]) ex.set(q.id, q);
+  out.extra = [...ex.values()].slice(-80);
+  out.xp = Math.max(a.xp || 0, b.xp || 0);
+  out.best = Math.max(a.best || 0, b.best || 0);
+  return out;
+}
+function trimState() {
+  const keys = Object.keys(state.days).sort();
+  for (const k of keys.slice(0, Math.max(0, keys.length - 120))) delete state.days[k];
+}
+function save() {
+  trimState();
+  try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+  if (sync.mode !== 'db') return;
+  clearTimeout(sync.timer);
+  sync.timer = setTimeout(flush, 700);
+}
+async function flush() {
+  if (sync.writing) { sync.pending = true; return; }
+  sync.writing = true;
+  try { await sync.ref.set(JSON.parse(JSON.stringify(state))); }
+  catch (e) { if (e && (e.code === 'invalid_argument' || e.code === 'revoked' || e.code === 'not_granted')) sync.mode = 'local'; }
+  sync.writing = false;
+  if (sync.pending) { sync.pending = false; flush(); }
+}
+
+/* ---------- банк вопросов ---------- */
+const bank = () => [...QUESTIONS, ...state.extra];
+const byId = id => bank().find(q => q.id === id);
+const whyFor = (q, i) => (q.w && q.w[i]) || (WHY[q.id] && WHY[q.id][i]) || '';
+const ans = id => state.answers[id];
+function record(q, picked, combo = 0) {
+  const ok = picked === q.a, t = today();
+  const gain = ok ? 10 + (combo >= 2 ? 5 : 0) : 3;
+  state.xp = (state.xp || 0) + gain;
+  record.lastGain = gain;
+  const a = state.answers[q.id] || { c: 0, w: 0, box: 0 };
+  if (ok) { a.c++; a.box = Math.min(5, a.box + 1); } else { a.w++; a.box = 0; }
+  a.last = t; state.answers[q.id] = a;
+  const day = state.days[t] || (state.days[t] = { ids: [], done: {}, n: 0, ok: 0 });
+  day.n = (day.n || 0) + 1; if (ok) day.ok = (day.ok || 0) + 1;
+  if (!ok) {
+    state.mistakes = [{ id: q.id, p: picked, d: t }, ...state.mistakes.filter(m => m.id !== q.id)].slice(0, 150);
+  }
+  return ok;
+}
+const reviewIds = () => state.mistakes.filter(m => byId(m.id) && (ans(m.id)?.box ?? 0) < 2).map(m => m.id);
+
+function dailySet() {
+  const t = today();
+  const day = state.days[t] || (state.days[t] = { ids: [], done: {}, n: 0, ok: 0 });
+  if (day.ids && day.ids.length) return day;
+  const rand = rng(hash(t));
+  const all = QUESTIONS.map(q => q.id);
+  const due = reviewIds().filter(id => (ans(id)?.last || '') < t).slice(0, 4);
+  const unseen = shuffle(all.filter(id => !ans(id) && !due.includes(id)), rand);
+  const seen = shuffle(all.filter(id => ans(id) && !due.includes(id)), rand).sort((x, y) => (ans(x).box - ans(y).box) || ((ans(x).last || '') < (ans(y).last || '') ? -1 : 1));
+  const pick = [...due];
+  for (const id of [...unseen, ...seen]) { if (pick.length >= DAILY) break; if (!pick.includes(id)) pick.push(id); }
+  day.ids = shuffle(pick, rand); day.done = day.done || {};
+  save();
+  return day;
+}
+function practiceSet(topic, n = 10) {
+  const rand = rng(Date.now());
+  const ids = bank().filter(q => q.t === topic).map(q => q.id);
+  const unseen = shuffle(ids.filter(id => !ans(id)), rand);
+  const seen = shuffle(ids.filter(id => ans(id)), rand).sort((x, y) => ans(x).box - ans(y).box);
+  return [...unseen, ...seen].slice(0, n);
+}
+function extraSet(n = 5) {
+  const rand = rng(Date.now());
+  const all = QUESTIONS.map(q => q.id);
+  const unseen = shuffle(all.filter(id => !ans(id)), rand);
+  const weak = shuffle(all.filter(id => ans(id) && ans(id).box < 3), rand);
+  const rest = shuffle(all, rand);
+  const out = [];
+  for (const id of [...unseen, ...weak, ...rest]) { if (out.length >= n) break; if (!out.includes(id)) out.push(id); }
+  return out;
+}
+function streak() {
+  const done = d => { const x = state.days[d]; return x && x.ids && x.ids.length && Object.keys(x.done || {}).length >= x.ids.length; };
+  let d = today(), s = 0;
+  if (!done(d)) d = addDays(d, -1);
+  while (done(d)) { s++; d = addDays(d, -1); }
+  return s;
+}
+
+/* ---------- утилиты отрисовки ---------- */
+const h = (tag, attrs = {}, ...kids) => {
+  const el = document.createElement(tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    if (v == null || v === false) continue;
+    if (k === 'class') el.className = v;
+    else if (k.startsWith('on')) el.addEventListener(k.slice(2), v);
+    else if (k === 'html') el.innerHTML = v;
+    else el.setAttribute(k, v === true ? '' : v);
+  }
+  for (const kid of kids.flat()) if (kid != null && kid !== false) el.append(kid.nodeType ? kid : document.createTextNode(String(kid)));
+  return el;
+};
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function highlight(src) {
+  const re = /(\/\/.*$|#.*$)|('(?:\\.|[^'\\\n])*'|"(?:\\.|[^"\\\n])*"|`(?:\\.|[^`\\])*`)|\b(\d+(?:\.\d+)?)\b|\b(const|let|var|function|return|async|await|new|if|else|for|of|in|typeof|instanceof|null|undefined|true|false|this|class|import|export|echo|throw)\b/gm;
+  let out = '', last = 0, m;
+  while ((m = re.exec(src))) {
+    out += esc(src.slice(last, m.index));
+    const cls = m[1] ? 'c' : m[2] ? 's' : m[3] ? 'n' : 'k';
+    out += '<span class="' + cls + '">' + esc(m[0]) + '</span>';
+    last = m.index + m[0].length;
+  }
+  return out + esc(src.slice(last));
+}
+const codeBlock = src => h('pre', { class: 'code', html: highlight(src) });
+const bar = (frac, cls = '') => h('div', { class: 'bar ' + cls, role: 'presentation' }, h('i', { style: 'width:' + Math.round(Math.max(0, Math.min(1, frac)) * 100) + '%' }));
+function richText(text) {
+  const box = h('div', { class: 'ai' });
+  text.split(/```[a-zA-Z]*\n?/).forEach((part, i) => {
+    if (i % 2) box.append(codeBlock(part.replace(/\n$/, '')));
+    else part.split(/\n{2,}/).map(s => s.trim()).filter(Boolean).forEach(p => box.append(h('p', {}, p.replace(/\*\*/g, ''))));
+  });
+  return box;
+}
+let toastT;
+function toast(msg) {
+  document.querySelector('.toast')?.remove();
+  const t = h('div', { class: 'toast', role: 'status' }, msg); document.body.append(t);
+  clearTimeout(toastT); toastT = setTimeout(() => t.remove(), 2600);
+}
+const fmtDate = key => { const [y, m, d] = key.split('-').map(Number); return new Date(y, m - 1, d).toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long' }); };
+const plural = (n, f) => f[(n % 10 === 1 && n % 100 !== 11) ? 0 : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 1 : 2];
+
+/* ---------- Claude (только на claude.ai) ---------- */
+const ai = { sample: null };
+const describeQ = q => 'Вопрос: ' + q.q + (q.code ? '\nКод:\n' + q.code : '') + '\nВарианты:\n' + q.o.map((o, i) => (i + 1) + ') ' + o).join('\n') + '\nПравильный ответ: ' + (q.a + 1) + ') ' + q.o[q.a];
+async function explain(q, picked, slot, btn) {
+  if (!ai.sample) return;
+  btn.disabled = true; slot.replaceChildren(h('p', { class: 'muted small' }, 'Claude думает…'));
+  const prompt = 'Ты помогаешь начинающему фронтенд-разработчику готовиться к собеседованию. Объясни подробнее по-русски простыми словами, 4–7 предложений. Если уместно, добавь короткий пример кода в блоке ```. Без заголовков и маркированных списков.\n\n'
+    + describeQ(q) + '\nОтвет ученика: ' + (picked + 1) + ') ' + q.o[picked] + '\nКороткое объяснение из тренажёра: ' + q.e
+    + (picked !== q.a ? '\nОбъясни, почему ответ ученика неверный и как запомнить правильный.' : '\nДобавь, где это пригодится в реальной работе.');
+  try {
+    await ai.sample(prompt, { onText: ({ text }) => slot.replaceChildren(richText(text)) });
+  } catch (e) {
+    if (e.code === 'not_granted' || e.code === 'sampling_disabled' || e.code === 'not_declared') { ai.sample = null; slot.replaceChildren(h('p', { class: 'muted small' }, 'Объяснения от Claude отключены для этой страницы.')); }
+    else slot.replaceChildren(e.text ? richText(e.text) : h('p', { class: 'muted small' }, e.code === 'rate_limited' ? 'Слишком много запросов. Попробуй через минуту.' : 'Не получилось получить объяснение. Попробуй ещё раз.'));
+  }
+  btn.disabled = false;
+}
+
+/* ---------- сессия квиза ---------- */
+let session = null;
+function startQuiz(mode, ids, title) {
+  ids = ids.filter(id => byId(id));
+  if (!ids.length) { toast('Вопросов для этого режима пока нет'); return; }
+  let i = 0;
+  if (mode === 'daily') { const day = dailySet(); i = Math.max(0, ids.findIndex(id => !(id in day.done))); }
+  session = { mode, ids, i, title, results: [], answered: false, combo: 0, xp0: state.xp || 0, dailyWasDone: mode === 'daily' ? dayDone(today()) : true };
+  renderQuiz();
+}
+function renderQuiz() {
+  const s = session, q = byId(s.ids[s.i]);
+  window.scrollTo(0, 0);
+  const counter = h('span', { class: 'mono small tnum muted' }, (s.i + 1) + ' / ' + s.ids.length);
+  const head = h('div', { class: 'qhead' },
+    h('button', { class: 'btn ghost', style: 'min-height:40px;padding:0 12px', onclick: () => { session = null; go(currentTab); } }, '← Выйти'),
+    bar(s.i / s.ids.length), s.combo >= 2 ? h('span', { class: 'combo', 'aria-label': 'Верных подряд: ' + s.combo }, 'комбо ×' + s.combo) : null, counter);
+  const opts = h('div', { class: 'opts', role: 'group', 'aria-label': 'Варианты ответа' });
+  const fbSlot = h('div', {});
+  q.o.forEach((o, idx) => {
+    opts.append(h('button', { class: 'opt', 'data-i': idx, onclick: () => choose(idx) },
+      h('span', { class: 'l' }, 'ABCD'[idx] || idx + 1), h('span', { class: 't' }, o)));
+  });
+  function choose(idx) {
+    if (s.answered) return;
+    s.answered = true;
+    const ok = record(q, idx, s.combo);
+    s.combo = ok ? s.combo + 1 : 0;
+    if (s.mode === 'daily') { const day = dailySet(); day.done[q.id] = ok ? 1 : 0; }
+    s.results.push({ id: q.id, ok, p: idx });
+    updateStreak(); save();
+    [...opts.children].forEach((b, j) => {
+      b.disabled = true;
+      if (j === q.a) b.classList.add('right');
+      else if (j === idx) b.classList.add('wrong');
+    });
+    const target = opts.children[ok ? q.a : idx];
+    const fl = h('span', { class: 'float', 'aria-hidden': 'true', style: ok ? '' : 'color:var(--muted)' }, '+' + record.lastGain + ' XP');
+    target.append(fl); setTimeout(() => fl.remove(), 1100);
+    const comboEl = head.querySelector('.combo');
+    if (s.combo >= 2) { const c = h('span', { class: 'combo' }, 'комбо ×' + s.combo); comboEl ? comboEl.replaceWith(c) : counter.before(c); }
+    else comboEl?.remove();
+    const aiSlot = h('div', {});
+    const aiBtn = ai.sample ? h('button', { class: 'btn line', onclick: () => explain(q, idx, aiSlot, aiBtn) }, 'Объясни подробнее') : null;
+    const last = s.i >= s.ids.length - 1;
+    const next = h('button', { class: 'btn block', onclick: () => { if (last) renderDone(); else { s.i++; s.answered = false; renderQuiz(); } } }, last ? 'Завершить' : 'Дальше');
+    const fb = ok
+      ? h('div', { class: 'fb ok' }, h('h3', {}, 'Верно'), h('p', {}, q.e))
+      : h('div', { class: 'fb bad' },
+          h('h3', {}, 'Неверно'),
+          h('div', {}, h('p', { class: 'lbl' }, 'Почему не подходит ', h('b', {}, q.o[idx])), h('p', {}, whyFor(q, idx) || 'Этот вариант не подходит к условию.')),
+          h('div', {}, h('p', { class: 'lbl' }, 'Правильный ответ: ', h('b', {}, q.o[q.a])), h('p', {}, q.e)),
+          h('p', { class: 'small muted' }, 'Вопрос сохранён в «Мои ошибки» и вернётся на повтор.'));
+    fbSlot.replaceChildren(fb, aiSlot, h('div', { class: 'row' }, aiBtn), next);
+    next.focus({ preventScroll: true });
+    fb.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'nearest' });
+  }
+  s.choose = choose;
+  $view.replaceChildren(head,
+    h('div', { class: 'row' }, h('span', { class: 'chip' }, TOPICS[q.t] || q.t), h('span', { class: 'chip' }, KINDS[q.k] || 'Вопрос'), q.gen ? h('span', { class: 'chip gen' }, 'от Claude') : null),
+    h('p', { class: 'qtext' }, q.q),
+    q.code ? codeBlock(q.code) : null,
+    opts, fbSlot);
+}
+function renderDone() {
+  const s = session, ok = s.results.filter(r => r.ok).length, wrong = s.results.filter(r => !r.ok);
+  session = null;
+  const gained = (state.xp || 0) - s.xp0;
+  const justDone = s.mode === 'daily' && !s.dailyWasDone && dayDone(today());
+  const n = streak();
+  const party = justDone ? h('div', { class: 'card celebrate' },
+    h('div', { html: FLAME.replace('class="flame"', 'class="flame on big"') }),
+    h('p', { class: 'num tnum' }, n),
+    h('h2', {}, plural(n, ['день', 'дня', 'дней']) + ' подряд'),
+    h('p', { class: 'muted' }, n >= (state.best || 0) && n > 1 ? 'Это твой лучший ударный режим. Завтра продолжаем.' : 'Ударный режим продлён. Возвращайся завтра за новой порцией.')) : null;
+  if (justDone) setTimeout(confetti, 150);
+  const list = wrong.length ? h('div', { class: 'card' }, h('h3', {}, 'Ошибки этой сессии'),
+    ...wrong.map(r => { const q = byId(r.id); return h('p', { class: 'small' }, '• ' + q.q + (q.code ? ' (код)' : '')); }),
+    h('button', { class: 'link', onclick: () => { go('progress'); setTimeout(() => document.getElementById('mistakes')?.scrollIntoView(), 0); } }, 'Открыть разбор ошибок')) : null;
+  $view.replaceChildren(
+    party,
+    h('div', { class: 'card' },
+      h('div', { class: 'spread' }, h('h2', {}, ok === s.results.length ? 'Без ошибок' : 'Готово'), h('span', { class: 'xpchip tnum' }, '+' + gained + ' XP')),
+      h('p', { class: 'mono tnum', style: 'font-size:28px;font-weight:600' }, ok + ' из ' + s.results.length),
+      bar(ok / Math.max(1, s.results.length), 'ok'),
+      h('p', { class: 'muted small' }, s.mode === 'daily' ? 'Задание на сегодня выполнено. Завтра будет новая порция и повтор ошибок.' : 'Ответы учтены в прогрессе.')),
+    list,
+    h('div', { class: 'row' },
+      h('button', { class: 'btn', onclick: () => startQuiz('extra', extraSet(5)) }, 'Ещё 5 вопросов'),
+      h('button', { class: 'btn ghost', onclick: () => go('today') }, 'На главную')));
+}
+
+/* ---------- экраны ---------- */
+let currentTab = 'today';
+const dayDone = d => { const x = state.days[d]; return !!(x && x.ids && x.ids.length && Object.keys(x.done || {}).length >= x.ids.length); };
+function updateStreak() {
+  const n = streak(), on = dayDone(today());
+  if (n > (state.best || 0)) state.best = n;
+  const el = document.getElementById('streak');
+  el.className = 'streak tnum' + (n ? ' on' : '');
+  el.innerHTML = FLAME.replace('class="flame"', 'class="flame' + (on ? ' on' : (n ? ' on' : '')) + '"') + '<b>' + n + '</b>';
+  el.setAttribute('aria-label', 'Ударный режим: ' + n + ' ' + plural(n, ['день', 'дня', 'дней']) + ' подряд');
+  const xp = document.getElementById('xp');
+  xp.textContent = 'Ур. ' + level(state.xp) + ' · ' + (state.xp || 0) + ' XP';
+}
+function weekStrip() {
+  const t = today(), names = ['вс', 'пн', 'вт', 'ср', 'чт', 'пт', 'сб'];
+  const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+  return h('div', { class: 'week', role: 'list', 'aria-label': 'Последние 7 дней' }, ...Array.from({ length: 7 }, (_, i) => {
+    const d = addDays(t, i - 6), [y, m, dd] = d.split('-').map(Number), wd = new Date(y, m - 1, dd).getDay();
+    const done = dayDone(d), part = !done && (state.days[d]?.n || 0) > 0;
+    return h('div', { class: 'd' + (done ? ' done' : part ? ' part' : '') + (d === t ? ' today' : ''), role: 'listitem', 'aria-label': names[wd] + ': ' + (done ? 'задание выполнено' : part ? 'были ответы' : 'нет занятий') },
+      h('span', { class: 'dot', html: done ? tick : '' }), names[wd]);
+  }));
+}
+function ring(done, total) {
+  const r = 38, c = 2 * Math.PI * r, frac = total ? done / total : 0;
+  const wrap = h('div', { class: 'ring' + (frac >= 1 ? ' full' : ''), role: 'img', 'aria-label': 'Выполнено ' + done + ' из ' + total });
+  wrap.innerHTML = '<svg viewBox="0 0 92 92"><circle class="trk" cx="46" cy="46" r="' + r + '"/><circle class="val" cx="46" cy="46" r="' + r + '" stroke-dasharray="' + c + '" stroke-dashoffset="' + c + '"/></svg><span class="tnum">' + done + '/' + total + '</span>';
+  requestAnimationFrame(() => requestAnimationFrame(() => { const v = wrap.querySelector('.val'); if (v) v.style.strokeDashoffset = String(c * (1 - frac)); }));
+  return wrap;
+}
+function confetti() {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const cv = h('canvas', { id: 'confetti' }); document.body.append(cv);
+  const ctx = cv.getContext('2d'), dpr = devicePixelRatio || 1;
+  cv.width = innerWidth * dpr; cv.height = innerHeight * dpr; ctx.scale(dpr, dpr);
+  const cs = getComputedStyle(document.documentElement);
+  const cols = ['--flame', '--accent', '--ok', '--code-str'].map(v => cs.getPropertyValue(v).trim() || '#E07A1F');
+  const ps = Array.from({ length: 140 }, () => ({ x: innerWidth / 2 + (Math.random() - .5) * 80, y: innerHeight * .35, vx: (Math.random() - .5) * 12, vy: -Math.random() * 13 - 4, s: 4 + Math.random() * 5, r: Math.random() * 6, vr: (Math.random() - .5) * .3, c: cols[Math.floor(Math.random() * cols.length)] }));
+  const t0 = performance.now();
+  (function frame(t) {
+    const k = (t - t0) / 1800; ctx.clearRect(0, 0, innerWidth, innerHeight);
+    for (const p of ps) { p.vy += .35; p.vx *= .99; p.x += p.vx; p.y += p.vy; p.r += p.vr; ctx.save(); ctx.globalAlpha = Math.max(0, 1 - k); ctx.translate(p.x, p.y); ctx.rotate(p.r); ctx.fillStyle = p.c; ctx.fillRect(-p.s / 2, -p.s / 4, p.s, p.s / 2); ctx.restore(); }
+    if (k < 1) requestAnimationFrame(frame); else cv.remove();
+  })(t0);
+}
+
+function viewToday() {
+  const t = today(), day = dailySet(), done = Object.keys(day.done).length, total = day.ids.length;
+  const okN = Object.values(day.done).filter(Boolean).length;
+  const review = reviewIds();
+  const answered = Object.values(state.answers);
+  const totalAns = answered.reduce((s, a) => s + a.c + a.w, 0), totalOk = answered.reduce((s, a) => s + a.c, 0);
+  const learned = QUESTIONS.filter(q => (ans(q.id)?.box || 0) >= 2).length;
+  const tip = NOTES[hash(t) % NOTES.length];
+  const n = streak(), doneToday = done >= total;
+  const main = h('div', { class: 'card' },
+    h('div', { class: 'hero' },
+      ring(done, total),
+      h('div', { style: 'display:flex;flex-direction:column;gap:4px;min-width:0' },
+        h('p', { class: 'muted small' }, fmtDate(t).replace(/^./, c => c.toUpperCase())),
+        h('h2', {}, doneToday ? 'Задание выполнено' : done ? 'Продолжим задание' : 'Задание на сегодня'),
+        h('p', { class: 'small muted' }, doneToday ? 'Верно ' + okN + ' из ' + total + '. Можно добрать ещё.' : total + ' ' + plural(total, ['вопрос', 'вопроса', 'вопросов']) + ' по разным темам, около 5 минут'))),
+    doneToday
+      ? h('button', { class: 'btn block', onclick: () => startQuiz('extra', extraSet(5)) }, 'Ещё 5 вопросов')
+      : h('button', { class: 'btn block', onclick: () => startQuiz('daily', day.ids) }, done ? 'Продолжить' : 'Начать'));
+  const strk = h('div', { class: 'card' },
+    h('div', { class: 'spread' },
+      h('div', { class: 'row', style: 'gap:8px' }, h('span', { html: FLAME.replace('class="flame"', 'class="flame' + (n ? ' on' : '') + '" style="width:26px;height:26px"') }),
+        h('h3', {}, 'Ударный режим: ' + n + ' ' + plural(n, ['день', 'дня', 'дней']))),
+      h('span', { class: 'small muted tnum' }, 'рекорд ' + Math.max(state.best || 0, n))),
+    weekStrip(),
+    !doneToday && n > 0 ? h('p', { class: 'risk' }, 'Пройди задание сегодня, чтобы не потерять ' + n + ' ' + plural(n, ['день', 'дня', 'дней']) + ' подряд.') : null,
+    !doneToday && n === 0 ? h('p', { class: 'small muted' }, 'Закрой дневное задание, и огонёк загорится. Каждый день подряд продлевает ударный режим.') : null);
+  const rev = h('div', { class: 'card' },
+    h('div', { class: 'spread' }, h('h3', {}, 'Ошибки на повтор'), h('span', { class: 'mono tnum' }, review.length)),
+    review.length
+      ? h('button', { class: 'btn ghost block', onclick: () => startQuiz('review', review.slice(0, 10)) }, 'Повторить ошибки')
+      : h('p', { class: 'muted small' }, 'Пока пусто. Вопросы, где ошибёшься, появятся здесь и будут возвращаться, пока не ответишь верно два раза подряд.'));
+  const tipCard = h('div', { class: 'card note' },
+    h('span', { class: 'tag' }, 'Памятка дня · ' + TOPICS[tip.t]), h('h3', {}, tip.h), h('p', {}, tip.b), tip.c ? codeBlock(tip.c) : null,
+    h('button', { class: 'link', style: 'align-self:flex-start', onclick: () => go('notes') }, 'Вся памятка'));
+  const stats = h('div', { class: 'stats' },
+    h('div', { class: 'stat' }, h('b', { class: 'tnum' }, totalAns), h('span', {}, 'ответов всего')),
+    h('div', { class: 'stat' }, h('b', { class: 'tnum' }, totalAns ? Math.round(totalOk / totalAns * 100) + '%' : '—'), h('span', {}, 'верных')),
+    h('div', { class: 'stat' }, h('b', { class: 'tnum' }, learned + '/' + QUESTIONS.length), h('span', {}, 'закреплено')));
+  const lv = level(state.xp), into = (state.xp || 0) % LEVEL_XP;
+  const lvl = h('div', { class: 'card' },
+    h('div', { class: 'spread' }, h('h3', {}, 'Уровень ' + lv), h('span', { class: 'small muted tnum' }, into + ' / ' + LEVEL_XP + ' XP')),
+    bar(into / LEVEL_XP),
+    h('p', { class: 'small muted' }, '+10 XP за верный ответ, +15 в комбо от трёх подряд, +3 за попытку.'));
+  return [main, strk, rev, lvl, tipCard, stats];
+}
+
+function viewTopics() {
+  const rows = Object.entries(TOPICS).map(([key, name]) => {
+    const qs = bank().filter(q => q.t === key);
+    const seen = qs.filter(q => ans(q.id)).length;
+    const a = qs.map(q => ans(q.id)).filter(Boolean);
+    const c = a.reduce((s, x) => s + x.c, 0), n = a.reduce((s, x) => s + x.c + x.w, 0);
+    return h('button', { class: 'topic', onclick: () => startQuiz('practice', practiceSet(key), name) },
+      h('b', {}, name), h('span', { class: 'mono small tnum muted' }, n ? Math.round(c / n * 100) + '%' : '—'),
+      h('span', { class: 'small muted', style: 'grid-column:1/-1' }, seen + ' из ' + qs.length + ' пройдено'),
+      bar(qs.length ? seen / qs.length : 0));
+  });
+  const out = [h('h2', { style: 'font-size:22px' }, 'Темы'), h('p', { class: 'muted small' }, 'Нажми на тему, чтобы пройти 10 вопросов по ней. Сначала идут новые, потом слабые.'), ...rows];
+  if (ai.sample) {
+    const sel = h('select', { id: 'gen-topic', class: 'search' }, ...Object.entries(TOPICS).map(([k, v]) => h('option', { value: k }, v)));
+    const status = h('p', { class: 'small muted' }, 'Claude составит 5 новых вопросов по теме с разбором ошибок. Они сохранятся в тренажёре.');
+    const btn = h('button', { class: 'btn block', onclick: () => generate(sel.value, status, btn) }, 'Сгенерировать 5 вопросов');
+    out.push(h('div', { class: 'card' }, h('h3', {}, 'Новые вопросы от Claude'), sel, status, btn));
+  }
+  return out;
+}
+async function generate(topic, status, btn) {
+  btn.disabled = true; status.textContent = 'Claude составляет вопросы… это может занять до минуты.';
+  const existing = bank().filter(q => q.t === topic).map(q => '- ' + q.q.slice(0, 90)).slice(0, 40).join('\n');
+  const prompt = 'Составь 5 новых вопросов для подготовки junior фронтенд-разработчика к собеседованию по теме «' + TOPICS[topic] + '». Пиши по-русски.\n'
+    + 'Смешай типы: «что выведет код» (с коротким кодом), практические ситуации и теорию. У каждого вопроса ровно 4 варианта и один правильный. Проверь правильность ответа особенно тщательно.\n'
+    + 'Ответь только JSON-массивом объектов вида {"q":"текст вопроса","code":"код или пустая строка","o":["вариант1","вариант2","вариант3","вариант4"],"a":0,"e":"объяснение правильного ответа 1–2 предложения","w":["почему вариант1 неверен или null для правильного", "...", "...", "..."]}.\n'
+    + 'Не повторяй эти вопросы:\n' + existing;
+  try {
+    const data = await ai.sample.json(prompt, { cache: false });
+    const stamp = Date.now().toString(36);
+    const qs = (Array.isArray(data) ? data : []).filter(x => x && typeof x.q === 'string' && Array.isArray(x.o) && x.o.length === 4 && Number.isInteger(x.a) && x.a >= 0 && x.a < 4)
+      .map((x, i) => ({ id: 'x' + stamp + i, t: topic, k: x.code ? 'code' : 'theory', gen: 1, q: String(x.q), code: x.code ? String(x.code) : '', o: x.o.map(String), a: x.a, e: String(x.e || ''),
+        w: Array.isArray(x.w) && x.w.length === 4 ? x.w.map((v, j) => j === x.a ? null : (v ? String(v) : '')) : null }));
+    if (!qs.length) throw { code: 'invalid_json' };
+    state.extra = [...state.extra, ...qs].slice(-80); save();
+    status.textContent = 'Готово: ' + qs.length + ' ' + plural(qs.length, ['вопрос', 'вопроса', 'вопросов']) + '. Вопросы от Claude могут содержать неточности, сверяйся с объяснением.';
+    startQuiz('practice', qs.map(q => q.id), TOPICS[topic]);
+  } catch (e) {
+    if (e.code === 'not_granted' || e.code === 'sampling_disabled' || e.code === 'not_declared') { ai.sample = null; status.textContent = 'Генерация через Claude отключена для этой страницы.'; }
+    else status.textContent = e.code === 'rate_limited' ? 'Слишком много запросов, попробуй позже.' : 'Не получилось составить вопросы. Попробуй ещё раз.';
+  }
+  btn.disabled = false;
+}
+
+let notesFilter = 'all', notesQuery = '';
+function viewNotes() {
+  const list = h('div', { style: 'display:flex;flex-direction:column;gap:12px' });
+  const draw = () => {
+    const qn = notesQuery.trim().toLowerCase();
+    const items = NOTES.filter(n => (notesFilter === 'all' || n.t === notesFilter) && (!qn || (n.h + ' ' + n.b + ' ' + (n.c || '')).toLowerCase().includes(qn)));
+    list.replaceChildren(...(items.length ? items.map(n => h('article', { class: 'card note' },
+      h('span', { class: 'tag' }, TOPICS[n.t]), h('h3', {}, n.h), h('p', {}, n.b), n.c ? codeBlock(n.c) : null))
+      : [h('p', { class: 'empty' }, 'Ничего не нашлось. Попробуй другое слово.')]));
+  };
+  const input = h('input', { id: 'notes-search', class: 'search', type: 'search', placeholder: 'Поиск: flex, git, промис…', value: notesQuery, oninput: e => { notesQuery = e.target.value; draw(); } });
+  const chips = h('div', { class: 'chips', role: 'group', 'aria-label': 'Фильтр по теме' },
+    ...[['all', 'Все'], ...Object.entries(TOPICS)].map(([k, v]) => h('button', { 'aria-pressed': String(notesFilter === k), onclick: e => { notesFilter = k; chips.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', 'false')); e.currentTarget.setAttribute('aria-pressed', 'true'); draw(); } }, v)));
+  draw();
+  return [h('h2', { style: 'font-size:22px' }, 'Памятка'), input, chips, list];
+}
+
+function viewProgress() {
+  const t = today();
+  const days = Array.from({ length: 14 }, (_, i) => addDays(t, i - 13));
+  const max = Math.max(5, ...days.map(d => state.days[d]?.n || 0));
+  const chart = h('div', { class: 'chart', role: 'img', 'aria-label': 'Ответы за 14 дней' }, ...days.map(d => {
+    const n = state.days[d]?.n || 0, ok = state.days[d]?.ok || 0;
+    return h('div', { class: 'col', title: d + ': ' + n + ' ответов, ' + ok + ' верных' },
+      h('div', { class: 'tot', style: 'height:' + (n / max * 100) + '%' }, h('div', { class: 'okp', style: 'height:' + (n ? ok / n * 100 : 0) + '%' })));
+  }));
+  const labels = h('div', { class: 'chart-lbl', 'aria-hidden': 'true' }, ...days.map(d => h('span', {}, String(Number(d.slice(8))))));
+  const table = h('table', {}, h('thead', {}, h('tr', {}, h('th', {}, 'Тема'), h('th', { class: 'r' }, 'Пройдено'), h('th', { class: 'r' }, 'Верно'))),
+    h('tbody', {}, ...Object.entries(TOPICS).map(([k, v]) => {
+      const qs = bank().filter(q => q.t === k), a = qs.map(q => ans(q.id)).filter(Boolean);
+      const c = a.reduce((s, x) => s + x.c, 0), n = a.reduce((s, x) => s + x.c + x.w, 0);
+      return h('tr', {}, h('td', {}, v), h('td', { class: 'r mono tnum' }, a.length + '/' + qs.length), h('td', { class: 'r mono tnum' }, n ? Math.round(c / n * 100) + '%' : '—'));
+    })));
+  const mistakes = state.mistakes.filter(m => byId(m.id));
+  const mlist = h('div', { id: 'mistakes', style: 'display:flex;flex-direction:column;gap:8px' },
+    ...(mistakes.length ? mistakes.map(m => {
+      const q = byId(m.id), fixed = (ans(m.id)?.box || 0) >= 2;
+      const body = h('div', { class: 'body', hidden: true },
+        q.code ? codeBlock(q.code) : null,
+        h('div', {}, h('p', { class: 'small', style: 'color:var(--bad);font-weight:600' }, 'Твой ответ: ' + q.o[m.p]), h('p', { class: 'small' }, whyFor(q, m.p))),
+        h('div', {}, h('p', { class: 'small', style: 'color:var(--ok);font-weight:600' }, 'Правильно: ' + q.o[q.a]), h('p', { class: 'small' }, q.e)),
+        h('button', { class: 'btn ghost', onclick: () => startQuiz('review', [q.id]) }, 'Ответить ещё раз'));
+      const toggle = h('button', { 'aria-expanded': 'false', onclick: () => { body.hidden = !body.hidden; toggle.setAttribute('aria-expanded', String(!body.hidden)); } },
+        h('span', { class: 'row' }, h('span', { class: 'pill ' + (fixed ? 'ok' : 'bad') }, fixed ? 'закреплено' : 'на повторе'), h('span', { class: 'small muted' }, TOPICS[q.t] + ' · ' + m.d.split('-').reverse().slice(0, 2).join('.'))),
+        h('span', { style: 'font-weight:600' }, q.q));
+      return h('div', { class: 'mistake' }, toggle, body);
+    }) : [h('p', { class: 'empty' }, 'Ошибок пока нет. Когда ответишь неверно, здесь появится разбор: почему твой вариант не подходит и какой ответ правильный.')]));
+  let confirmEl;
+  const reset = h('button', { class: 'link', style: 'color:var(--bad)', onclick: () => {
+    if (confirmEl) return;
+    confirmEl = h('div', { class: 'card' }, h('p', {}, 'Удалить весь прогресс, серию и ошибки? Отменить будет нельзя.'),
+      h('div', { class: 'row' },
+        h('button', { class: 'btn', style: 'background:var(--bad);color:#fff', onclick: () => { state = blank(); save(); go('progress'); toast('Прогресс сброшен'); } }, 'Удалить'),
+        h('button', { class: 'btn ghost', onclick: () => { confirmEl.remove(); confirmEl = null; } }, 'Отмена')));
+    reset.after(confirmEl);
+  } }, 'Сбросить прогресс');
+  return [
+    h('h2', { style: 'font-size:22px' }, 'Прогресс'),
+    h('div', { class: 'card' }, h('h3', {}, 'Последние 14 дней'), chart, labels, h('p', { class: 'small muted' }, 'Высота столбика — сколько ответов за день, зелёная часть — сколько верных.')),
+    h('div', { class: 'card' }, h('h3', {}, 'По темам'), h('div', { style: 'overflow-x:auto' }, table)),
+    h('div', { class: 'card' }, h('div', { class: 'spread' }, h('h3', {}, 'Мои ошибки'), h('span', { class: 'mono tnum muted' }, mistakes.length)),
+      h('p', { class: 'small muted' }, 'Нажми на вопрос, чтобы открыть разбор.'), mlist),
+    h('p', { class: 'small muted' }, sync.mode === 'db' ? 'Прогресс сохраняется в аккаунте Claude и одинаков на всех устройствах.' : 'Прогресс хранится на этом устройстве.'),
+    reset];
+}
+
+const VIEWS = { today: viewToday, topics: viewTopics, notes: viewNotes, progress: viewProgress };
+function go(tab) {
+  currentTab = tab; session = null;
+  document.querySelectorAll('.tab').forEach(b => b.dataset.tab === tab ? b.setAttribute('aria-current', 'page') : b.removeAttribute('aria-current'));
+  $view.replaceChildren(...VIEWS[tab]());
+  window.scrollTo(0, 0);
+  try { localStorage.setItem(LS_KEY + '-tab', tab); } catch (e) {}
+}
+document.querySelectorAll('.tab').forEach(b => b.addEventListener('click', () => go(b.dataset.tab)));
+addEventListener('keydown', e => {
+  if (!session || e.target.closest('input,select,textarea')) return;
+  const n = '1234'.indexOf(e.key); if (n >= 0 && !session.answered) { session.choose?.(n); }
+});
+
+/* ---------- старт ---------- */
+let startTab = 'today';
+try { const t = localStorage.getItem(LS_KEY + '-tab'); if (t && VIEWS[t]) startTab = t; } catch (e) {}
+updateStreak(); go(startTab);
+
+(async () => {
+  if (!window.claude || typeof window.claude.use !== 'function') return;
+  const [db, user, sample] = await Promise.all([claude.use('db'), claude.use('user'), claude.use('sample')]);
+  if (sample) ai.sample = sample;
+  if (db && user) {
+    const uid = await user.id();
+    if (uid) {
+      try {
+        const ref = db.doc('data/users/' + uid + '/progress');
+        const snap = await ref.get();
+        if (snap.exists) state = merge(snap.data(), state);
+        sync.mode = 'db'; sync.ref = ref;
+        if (!snap.exists && Object.keys(state.answers).length) save();
+        try { localStorage.setItem(LS_KEY, JSON.stringify(state)); } catch (e) {}
+      } catch (e) { sync.mode = 'local'; }
+    }
+  }
+  if (!session) { updateStreak(); go(currentTab); }
+})();
+
+if (IS_PWA && 'serviceWorker' in navigator && window.top === window) {
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+}
+</script>
+</body>
+</html>
